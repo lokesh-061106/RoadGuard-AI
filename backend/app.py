@@ -20,7 +20,10 @@ app = Flask(__name__, static_folder=frontend_dir, static_url_path='')
 
 # Configuration
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "roadguard_secure_vibe_coding_key_2026")
-UPLOAD_FOLDER = os.path.join(frontend_dir, 'static', 'uploads')
+if os.environ.get("VERCEL") == "1":
+    UPLOAD_FOLDER = '/tmp/uploads'
+else:
+    UPLOAD_FOLDER = os.path.join(frontend_dir, 'static', 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB Upload Limit
@@ -467,6 +470,12 @@ def get_admin_stats():
 # =====================================================================
 # STATIC FILE SERVING routes
 # =====================================================================
+
+@app.route('/static/uploads/<path:filename>')
+def serve_uploads(filename):
+    if os.environ.get("VERCEL") == "1":
+        return send_from_directory('/tmp/uploads', filename)
+    return send_from_directory(os.path.join(frontend_dir, 'static', 'uploads'), filename)
 
 @app.route('/')
 def root():

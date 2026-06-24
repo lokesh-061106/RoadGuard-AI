@@ -18,14 +18,33 @@ class JSONDatabaseManager:
         if self._initialized:
             return
         
-        if db_dir is None:
-            # Default to the folder where this script is located + 'db'
-            base_dir = os.path.dirname(os.path.abspath(__file__))
-            self.db_dir = os.path.join(base_dir, 'db')
+        # Check if we are running in Vercel serverless environment
+        if os.environ.get("VERCEL") == "1":
+            self.db_dir = "/tmp/db"
+            os.makedirs(self.db_dir, exist_ok=True)
+            
+            # Copy baseline seed data files from read-only package bundle to /tmp/db
+            project_db_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'db')
+            if os.path.exists(project_db_dir):
+                import shutil
+                for filename in os.listdir(project_db_dir):
+                    src_file = os.path.join(project_db_dir, filename)
+                    dest_file = os.path.join(self.db_dir, filename)
+                    if os.path.isfile(src_file) and not os.path.exists(dest_file):
+                        try:
+                            shutil.copy2(src_file, dest_file)
+                            print(f"Copied {filename} to /tmp/db")
+                        except Exception as e:
+                            print(f"Error copying {filename}: {e}")
         else:
-            self.db_dir = db_dir
+            if db_dir is None:
+                # Default to the folder where this script is located + 'db'
+                base_dir = os.path.dirname(os.path.abspath(__file__))
+                self.db_dir = os.path.join(base_dir, 'db')
+            else:
+                self.db_dir = db_dir
+            os.makedirs(self.db_dir, exist_ok=True)
 
-        os.makedirs(self.db_dir, exist_ok=True)
         self.locks: Dict[str, threading.Lock] = {}
         self._initialized = True
 
