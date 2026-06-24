@@ -324,6 +324,9 @@ function initReportPage() {
       });
       const data = await res.json();
       if (res.ok) {
+        if (data.events) {
+          sessionStorage.setItem(`telemetry_${data.incident_id}`, JSON.stringify(data.events));
+        }
         window.location.href = data.redirect_url;
       } else {
         alert("Submission failed: " + data.message);
@@ -464,6 +467,30 @@ function initMonitoringPage() {
       document.getElementById('complete-controls').style.display = 'block';
     }
   };
+
+  // Check if we have pre-computed telemetry in sessionStorage
+  const cachedTelemetry = sessionStorage.getItem(`telemetry_${incidentId}`);
+  if (cachedTelemetry) {
+    logToConsole("Stateless telemetry cache found. Playing back multi-agent execution telemetry...", "system");
+    try {
+      const events = JSON.parse(cachedTelemetry);
+      let index = 0;
+      const playNext = () => {
+        if (index < events.length) {
+          const ev = events[index];
+          handleEvent(ev.event, ev.data);
+          index++;
+          let delay = 1000;
+          if (ev.event === 'agent_progress') delay = 500;
+          setTimeout(playNext, delay);
+        }
+      };
+      playNext();
+      return;
+    } catch (err) {
+      logToConsole("Error parsing cached telemetry: " + err.message, "error");
+    }
+  }
 
   // Open EventSource connection for Server-Sent Events (SSE)
   const es = new EventSource(`/api/incidents/${incidentId}/stream`);

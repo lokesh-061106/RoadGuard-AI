@@ -227,29 +227,42 @@ def submit_report():
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
     file.save(file_path)
 
-    # Create preliminary incident
+    # Create incident ID
     incident_id = f"inc_{int(datetime.datetime.utcnow().timestamp() * 1000)}"
     
-    # Store temporary record (before agent processing starts)
-    incidents = db.read('incidents', default=[])
-    incidents.append({
-        "id": incident_id,
-        "reporter_id": user_id,
-        "reporter_name": session.get('name', 'Citizen'),
-        "image_name": unique_filename,
-        "image_url": f"/static/uploads/{unique_filename}",
-        "description": submission.description,
-        "latitude": submission.latitude,
-        "longitude": submission.longitude,
-        "status": "pending_analysis",
-        "created_at": datetime.datetime.utcnow().isoformat() + "Z"
-    })
-    db.write('incidents', incidents)
+    # Run the pipeline synchronously during the submit request
+    # This prevents serverless filesystem split-brain / 404 errors on Vercel
+    import json
+    events = []
+    try:
+        for event in agent_engine.execute_pipeline(
+            incident_id=incident_id,
+            reporter_id=user_id,
+            description=submission.description,
+            latitude=submission.latitude,
+            longitude=submission.longitude,
+            image_name=unique_filename
+        ):
+            lines = event.strip().split('\n')
+            if len(lines) >= 2:
+                event_type = lines[0].replace('event:', '').strip()
+                event_data_str = lines[1].replace('data:', '').strip()
+                try:
+                    event_data = json.loads(event_data_str)
+                    events.append({
+                        "event": event_type,
+                        "data": event_data
+                    })
+                except Exception:
+                    pass
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Pipeline execution failed: {str(e)}"}), 500
 
     return jsonify({
         "status": "success",
-        "message": "Incident submission registered. Directing to live monitoring.",
+        "message": "Incident submission registered and analyzed successfully.",
         "incident_id": incident_id,
+        "events": events,
         "redirect_url": f"/monitoring.html?id={incident_id}"
     }), 201
 
