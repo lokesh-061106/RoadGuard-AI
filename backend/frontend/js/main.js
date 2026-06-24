@@ -348,16 +348,44 @@ function initReportPage() {
         if (data.events) {
           sessionStorage.setItem(`telemetry_${data.incident_id}`, JSON.stringify(data.events));
         }
-        if (data.incident) {
-          try {
-            let localIncidents = JSON.parse(localStorage.getItem('local_incidents') || '[]');
-            localIncidents = localIncidents.filter(i => i.id !== data.incident.id);
-            localIncidents.push(data.incident);
-            localStorage.setItem('local_incidents', JSON.stringify(localIncidents));
-          } catch (e) {
-            console.error("Failed to save incident to localStorage:", e);
-          }
+        
+        // Construct fallback incident locally if server does not return it (stateless fallback)
+        let incidentToSave = data.incident;
+        if (!incidentToSave) {
+          const latInput = document.getElementById('lat-input');
+          const lonInput = document.getElementById('lon-input');
+          const descInput = document.getElementById('desc-input');
+          incidentToSave = {
+            id: data.incident_id,
+            reporter_id: State.user ? State.user.id : "usr_anonymous",
+            reporter_name: State.user ? State.user.name : "Citizen Contributor",
+            description: descInput ? descInput.value : "",
+            latitude: latInput ? parseFloat(latInput.value) : 12.9716,
+            longitude: lonInput ? parseFloat(lonInput.value) : 77.5946,
+            image_name: (fileInput && fileInput.files[0]) ? fileInput.files[0].name : "pothole.jpg",
+            image_url: (uploadPreview && uploadPreview.src) ? uploadPreview.src : "/static/images/pothole_nh44.jpg",
+            status: "reported",
+            created_at: new Date().toISOString(),
+            risk: {
+              priority: "Medium",
+              explanation: "AI danger assessment is processing..."
+            },
+            detection: {
+              damage_type: "Pothole",
+              category: "Road Damage"
+            }
+          };
         }
+
+        try {
+          let localIncidents = JSON.parse(localStorage.getItem('local_incidents') || '[]');
+          localIncidents = localIncidents.filter(i => i.id !== incidentToSave.id);
+          localIncidents.push(incidentToSave);
+          localStorage.setItem('local_incidents', JSON.stringify(localIncidents));
+        } catch (e) {
+          console.error("Failed to save incident to localStorage:", e);
+        }
+
         window.location.href = data.redirect_url;
       } else {
         alert("Submission failed: " + data.message);
@@ -785,49 +813,54 @@ async function initCitizenDashboard() {
     }
 
     // Load reports
-    const resInc = await fetch(`/api/incidents?user_id=${State.user.id}`);
-    if (resInc.ok) {
-      let incidents = await resInc.json();
-      
-      // Merge with local incidents to combat Vercel container recycling
-      try {
-        const localIncidents = JSON.parse(localStorage.getItem('local_incidents') || '[]')
-          .filter(i => i.reporter_id === State.user.id);
-          
-        const existingIds = new Set(incidents.map(i => i.id));
-        localIncidents.forEach(li => {
-          if (!existingIds.has(li.id)) {
-            incidents.push(li);
-          }
-        });
+    let incidents = [];
+    try {
+      const resInc = await fetch(`/api/incidents?user_id=${State.user.id}`);
+      if (resInc.ok) {
+        incidents = await resInc.json();
+      }
+    } catch (err) {
+      console.error("Failed to fetch server incidents:", err);
+    }
+    
+    // Always merge with local cache to handle serverless recycles
+    try {
+      const localIncidents = JSON.parse(localStorage.getItem('local_incidents') || '[]')
+        .filter(i => i.reporter_id === State.user.id);
         
-        incidents.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-      } catch (err) {
-        console.error("Error merging local incidents:", err);
-      }
+      const existingIds = new Set(incidents.map(i => i.id));
+      localIncidents.forEach(li => {
+        if (!existingIds.has(li.id)) {
+          incidents.push(li);
+        }
+      });
+      
+      incidents.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    } catch (err) {
+      console.error("Error merging local incidents:", err);
+    }
 
-      const listContainer = document.getElementById('citizen-reports-list');
-      if (listContainer) {
-        listContainer.innerHTML = incidents.map(inc => {
-          const incId = inc.id || 'inc_0000';
-          const cleanId = incId.includes('_') ? incId.split('_')[1] : incId;
-          return `
-            <div class="glass-panel report-item">
-              <div>
-                <h4 style="font-weight:700;">#${cleanId} - ${inc.detection?.damage_type || 'Infrastructure Hazard'}</h4>
-                <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.25rem;">
-                  📍 Coordinate: ${inc.latitude.toFixed(4)}, ${inc.longitude.toFixed(4)} | Reported: ${new Date(inc.created_at).toLocaleDateString()}
-                </p>
-              </div>
-              <div style="display:flex; align-items:center; gap:1rem;">
-                <span class="badge badge-${getSeverityClass(inc.risk?.priority || 'Low')}">${inc.risk?.priority || 'Pending'}</span>
-                <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">${inc.status.toUpperCase()}</span>
-                <a href="/tracker.html?id=${inc.id}" class="btn btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.8rem;">Track</a>
-              </div>
+    const listContainer = document.getElementById('citizen-reports-list');
+    if (listContainer) {
+      listContainer.innerHTML = incidents.map(inc => {
+        const incId = inc.id || 'inc_0000';
+        const cleanId = incId.includes('_') ? incId.split('_')[1] : incId;
+        return `
+          <div class="glass-panel report-item">
+            <div>
+              <h4 style="font-weight:700;">#${cleanId} - ${inc.detection?.damage_type || 'Infrastructure Hazard'}</h4>
+              <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.25rem;">
+                📍 Coordinate: ${inc.latitude.toFixed(4)}, ${inc.longitude.toFixed(4)} | Reported: ${new Date(inc.created_at).toLocaleDateString()}
+              </p>
             </div>
-          `;
-        }).join('') || `<p style="color:var(--text-muted); font-size:0.95rem;">You haven't reported any infrastructure issues yet.</p>`;
-      }
+            <div style="display:flex; align-items:center; gap:1rem;">
+              <span class="badge badge-${getSeverityClass(inc.risk?.priority || 'Low')}">${inc.risk?.priority || 'Pending'}</span>
+              <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">${inc.status.toUpperCase()}</span>
+              <a href="/tracker.html?id=${inc.id}" class="btn btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.8rem;">Track</a>
+            </div>
+          </div>
+        `;
+      }).join('') || `<p style="color:var(--text-muted); font-size:0.95rem;">You haven't reported any infrastructure issues yet.</p>`;
     }
   } catch (err) {
     console.error("Dashboard loading error:", err);
