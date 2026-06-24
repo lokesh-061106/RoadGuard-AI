@@ -14,23 +14,23 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "api/index.py"
+      "dest": "/api/index.py"
     },
     {
       "src": "/css/(.*)",
-      "dest": "frontend/css/$1"
+      "dest": "/frontend/css/$1"
     },
     {
       "src": "/js/(.*)",
-      "dest": "frontend/js/$1"
+      "dest": "/frontend/js/$1"
     },
     {
       "src": "/static/(.*)",
-      "dest": "frontend/static/$1"
+      "dest": "/frontend/static/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "frontend/$1"
+      "dest": "/frontend/$1"
     }
   ]
 }
