@@ -284,6 +284,55 @@ def stream_incident_execution(id):
 
     return Response(generate(), mimetype='text/event-stream')
 
+@app.route('/api/incidents/<id>/run-sync', methods=['POST'])
+def run_incident_pipeline_sync(id):
+    """
+    Synchronous fallback endpoint for serverless environments (Vercel) where 
+    real-time SSE streaming is blocked/buffered. Runs the pipeline and returns the full log set.
+    """
+    import json
+    incidents = db.read('incidents', default=[])
+    incident = None
+    for inc in incidents:
+        if inc.get("id") == id:
+            incident = inc
+            break
+
+    if not incident:
+        return jsonify({"status": "error", "message": "Incident not found"}), 404
+
+    events = []
+    try:
+        # Run the generator and extract all yielded chunks
+        for event in agent_engine.execute_pipeline(
+            incident_id=incident.get("id"),
+            reporter_id=incident.get("reporter_id"),
+            description=incident.get("description"),
+            latitude=incident.get("latitude"),
+            longitude=incident.get("longitude"),
+            image_name=incident.get("image_name")
+        ):
+            # Parse the SSE formatted string to recreate JSON events
+            lines = event.strip().split('\n')
+            if len(lines) >= 2:
+                event_type = lines[0].replace('event:', '').strip()
+                event_data_str = lines[1].replace('data:', '').strip()
+                try:
+                    event_data = json.loads(event_data_str)
+                    events.append({
+                        "event": event_type,
+                        "data": event_data
+                    })
+                except Exception as json_err:
+                    print(f"Error parsing event json: {json_err} for string: {event_data_str}")
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Sync pipeline execution failed: {str(e)}"}), 500
+
+    return jsonify({
+        "status": "success",
+        "events": events
+    }), 200
+
 
 # =====================================================================
 # GENERAL DATABASE API ENDPOINTS

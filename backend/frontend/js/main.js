@@ -338,86 +338,132 @@ function initMonitoringPage() {
 
   logToConsole(`Starting stream interface client for incident ${incidentId}...`, 'system');
 
+  let syncFallbackInitiated = false;
+
+  const handleEvent = (eventType, eventData) => {
+    if (eventType === 'pipeline_start') {
+      logToConsole(eventData.message, 'system');
+    } else if (eventType === 'agent_start') {
+      logToConsole(`>>> Agent activated: "${eventData.agent}" (${eventData.role})`, 'start');
+      logToConsole(`Status: ${eventData.status}`, 'progress');
+      
+      const stepNum = getStepNum(eventData.agent);
+      if (stepNum && timelineItems[stepNum]) {
+        resetTimelineClasses();
+        timelineItems[stepNum].classList.add('active');
+        timelineItems[stepNum].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    } else if (eventType === 'agent_progress') {
+      logToConsole(eventData.log, 'progress');
+      if (eventData.tool_calls && eventData.tool_calls.length > 0) {
+        eventData.tool_calls.forEach(tc => {
+          logToConsole(`[Tool Call] Executing: ${tc.name}(${JSON.stringify(tc.args)})`, 'system');
+        });
+      }
+    } else if (eventType === 'agent_success') {
+      logToConsole(`<<< Agent "${eventData.agent}" executed successfully.`, 'success');
+      
+      const stepNum = getStepNum(eventData.agent);
+      if (stepNum && timelineItems[stepNum]) {
+        timelineItems[stepNum].classList.remove('active');
+        timelineItems[stepNum].classList.add('done');
+        
+        const outputBox = timelineItems[stepNum].querySelector('.timeline-output');
+        if (outputBox) {
+          outputBox.innerText = JSON.stringify(eventData.output, null, 2);
+          outputBox.style.display = 'block';
+        }
+      }
+    } else if (eventType === 'pipeline_complete') {
+      logToConsole(`*** PIPELINE RUN FINISHED: ${eventData.message} Status: ${eventData.final_status} ***`, 'system');
+      
+      resetTimelineClasses();
+      if (timelineItems[6]) {
+        timelineItems[6].classList.add('done');
+        const outputBox = timelineItems[6].querySelector('.timeline-output');
+        if (outputBox) {
+          outputBox.innerText = JSON.stringify({ status: "Database analytics rebuilt successfully." }, null, 2);
+          outputBox.style.display = 'block';
+        }
+      }
+      document.getElementById('complete-controls').style.display = 'block';
+    }
+  };
+
+  const runSyncFallback = async () => {
+    if (syncFallbackInitiated) return;
+    syncFallbackInitiated = true;
+    
+    logToConsole("Vercel serverless buffering detected. Switching to high-speed REST sync-channel...", "system");
+    
+    try {
+      const res = await fetch(`/api/incidents/${incidentId}/run-sync`, { method: 'POST' });
+      if (!res.ok) {
+        throw new Error(`Sync API returned status ${res.status}`);
+      }
+      
+      const resData = await res.json();
+      if (resData.status === 'success') {
+        logToConsole("Sync-channel data received. Playing back multi-agent execution telemetry...", "system");
+        
+        // Play back the events with typewriter delays to preserve the visual wow effect
+        let index = 0;
+        const playNext = () => {
+          if (index < resData.events.length) {
+            const ev = resData.events[index];
+            handleEvent(ev.event, ev.data);
+            index++;
+            
+            // Delays simulate live agents processing
+            let delay = 1000;
+            if (ev.event === 'agent_progress') delay = 500;
+            setTimeout(playNext, delay);
+          }
+        };
+        playNext();
+      } else {
+        logToConsole(`Pipeline execution failed: ${resData.message}`, 'error');
+        document.getElementById('complete-controls').style.display = 'block';
+      }
+    } catch (err) {
+      logToConsole(`Failed to execute fallback pipeline: ${err.message}`, 'error');
+      document.getElementById('complete-controls').style.display = 'block';
+    }
+  };
+
   // Open EventSource connection for Server-Sent Events (SSE)
   const es = new EventSource(`/api/incidents/${incidentId}/stream`);
 
   es.addEventListener('pipeline_start', (e) => {
     const data = JSON.parse(e.data);
-    logToConsole(data.message, 'system');
+    handleEvent('pipeline_start', data);
   });
 
   es.addEventListener('agent_start', (e) => {
     const data = JSON.parse(e.data);
-    logToConsole(`>>> Agent activated: "${data.agent}" (${data.role})`, 'start');
-    logToConsole(`Status: ${data.status}`, 'progress');
-    
-    // Highlight step in UI
-    const stepNum = getStepNum(data.agent);
-    if (stepNum && timelineItems[stepNum]) {
-      resetTimelineClasses();
-      timelineItems[stepNum].classList.add('active');
-      timelineItems[stepNum].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+    handleEvent('agent_start', data);
   });
 
   es.addEventListener('agent_progress', (e) => {
     const data = JSON.parse(e.data);
-    logToConsole(data.log, 'progress');
-    if (data.tool_calls && data.tool_calls.length > 0) {
-      data.tool_calls.forEach(tc => {
-        logToConsole(`[Tool Call] Executing: ${tc.name}(${JSON.stringify(tc.args)})`, 'system');
-      });
-    }
+    handleEvent('agent_progress', data);
   });
 
   es.addEventListener('agent_success', (e) => {
     const data = JSON.parse(e.data);
-    logToConsole(`<<< Agent "${data.agent}" executed successfully.`, 'success');
-    
-    const stepNum = getStepNum(data.agent);
-    if (stepNum && timelineItems[stepNum]) {
-      timelineItems[stepNum].classList.remove('active');
-      timelineItems[stepNum].classList.add('done');
-      
-      // Populate JSON details node
-      const outputBox = timelineItems[stepNum].querySelector('.timeline-output');
-      if (outputBox) {
-        outputBox.innerText = JSON.stringify(data.output, null, 2);
-        outputBox.style.display = 'block';
-      }
-    }
+    handleEvent('agent_success', data);
   });
 
   es.addEventListener('pipeline_complete', (e) => {
     const data = JSON.parse(e.data);
-    logToConsole(`*** PIPELINE RUN FINISHED: ${data.message} Status: ${data.final_status} ***`, 'system');
-    
-    // Highlight Step 6 (Analytics Updated)
-    resetTimelineClasses();
-    if (timelineItems[6]) {
-      timelineItems[6].classList.add('done');
-      const outputBox = timelineItems[6].querySelector('.timeline-output');
-      if (outputBox) {
-        outputBox.innerText = JSON.stringify({ status: "Database analytics rebuilt successfully." }, null, 2);
-        outputBox.style.display = 'block';
-      }
-    }
-
+    handleEvent('pipeline_complete', data);
     es.close();
-    
-    // Show navigation controls
-    document.getElementById('complete-controls').style.display = 'block';
   });
 
   es.addEventListener('error', (e) => {
-    let msg = "SSE Connection closed or crashed.";
-    if (e.data) {
-      const data = JSON.parse(e.data);
-      msg = data.message;
-    }
-    logToConsole(`ERROR: ${msg}`, 'error');
     es.close();
-    document.getElementById('complete-controls').style.display = 'block';
+    // Fallback immediately to the synchronous REST channel on Vercel
+    runSyncFallback();
   });
 }
 
