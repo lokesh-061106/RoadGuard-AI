@@ -16,14 +16,14 @@ def main():
     # Check directory layouts
     db_dir = os.path.join(backend_dir, 'db')
     os.makedirs(db_dir, exist_ok=True)
-    print(f"✓ Database folder validated: {db_dir}")
+    print(f"[OK] Database folder validated: {db_dir}")
 
     # Check for API Key
     api_key = os.environ.get("GEMINI_API_KEY")
     if api_key:
-        print("✓ Google Gemini API configuration detected. Live AI enabled.")
+        print("[OK] Google Gemini API configuration detected. Live AI enabled.")
     else:
-        print("⚠ GEMINI_API_KEY environment variable not found.")
+        print("[WARN] GEMINI_API_KEY environment variable not found.")
         print("  Running in safe rule-based simulation fallback mode.")
 
     print("\nStarting RoadGuard AI Web Server on http://localhost:5000...")

@@ -228,6 +228,53 @@ def get_me():
     return jsonify({"status": "error", "message": "User not found"}), 404
 
 
+@app.route('/api/auth/sync', methods=['POST'])
+def sync_users():
+    try:
+        data = request.get_json() or {}
+        client_users = data.get("users", [])
+    except Exception:
+        return jsonify({"status": "error", "message": "Invalid JSON data"}), 400
+
+    users = db.read('users', default=[])
+    existing_emails = {u.get("email") for u in users}
+    existing_ids = {u.get("id") for u in users}
+
+    synced_count = 0
+    for client_user in client_users:
+        email = client_user.get("email")
+        if email and email not in existing_emails:
+            user_id = client_user.get("id") or f"usr_{int(datetime.datetime.utcnow().timestamp() * 1000)}"
+            if user_id in existing_ids:
+                user_id = f"usr_{int(datetime.datetime.utcnow().timestamp() * 1000) + synced_count}"
+            
+            # Hash password safely
+            raw_password = client_user.get("password", "password123")
+            hashed_password = generate_password_hash(raw_password)
+            
+            new_user = {
+                "id": user_id,
+                "name": client_user.get("name", "Citizen Contributor"),
+                "email": email,
+                "password": hashed_password,
+                "role": client_user.get("role", "citizen"),
+                "points": client_user.get("points", 40),
+                "trust_score": client_user.get("trust_score", 100),
+                "trust_level": client_user.get("trust_level", "Trusted Citizen"),
+                "badges": client_user.get("badges", []),
+                "created_at": client_user.get("created_at") or (datetime.datetime.utcnow().isoformat() + "Z")
+            }
+            users.append(new_user)
+            existing_emails.add(email)
+            existing_ids.add(user_id)
+            synced_count += 1
+            
+    if synced_count > 0:
+        db.write('users', users)
+        
+    return jsonify({"status": "success", "synced_count": synced_count}), 200
+
+
 # =====================================================================
 # REPORT SUBMISSION & SSE PIPELINE
 # =====================================================================

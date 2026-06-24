@@ -53,11 +53,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Instantly bind forms and page logic
   routePageLogic();
 
-  // Perform background server auth checks
-  checkAuthStatus().then(() => {
-    if (State.user) {
-      syncLocalIncidentsWithServer();
-    }
+  // Perform background server auth and user sync
+  syncLocalUsersWithServer().then(() => {
+    checkAuthStatus().then(() => {
+      if (State.user) {
+        syncLocalIncidentsWithServer();
+      }
+    });
   });
 });
 
@@ -65,13 +67,30 @@ document.addEventListener('DOMContentLoaded', () => {
 // AUTHENTICATION & UI NAVIGATION STATE
 // =====================================================================
 
+async function syncLocalUsersWithServer() {
+  const localUsers = JSON.parse(localStorage.getItem('local_users') || '[]');
+  if (localUsers.length === 0) return;
+  
+  try {
+    const res = await fetch('/api/auth/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ users: localUsers })
+    });
+    if (res.ok) {
+      console.log("Local users synced successfully with transient server DB.");
+    }
+  } catch (err) {
+    console.error("Failed to sync local users with server:", err);
+  }
+}
+
 async function checkAuthStatus() {
   const localUserStr = localStorage.getItem('user');
   if (localUserStr) {
     try {
       State.user = JSON.parse(localUserStr);
       updateNavbar(true);
-      return;
     } catch (err) {
       localStorage.removeItem('user');
     }
@@ -83,15 +102,30 @@ async function checkAuthStatus() {
       const data = await res.json();
       State.user = data.user;
       localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Keep local_users sync cache updated with latest points/badges/trust score from server
+      const localUsers = JSON.parse(localStorage.getItem('local_users') || '[]');
+      const existingIdx = localUsers.findIndex(u => u.email === data.user.email);
+      if (existingIdx >= 0) {
+        const savedPassword = localUsers[existingIdx].password;
+        localUsers[existingIdx] = {
+          ...data.user,
+          password: savedPassword
+        };
+        localStorage.setItem('local_users', JSON.stringify(localUsers));
+      }
+      
       updateNavbar(true);
     } else {
       State.user = null;
+      localStorage.removeItem('user');
       updateNavbar(false);
     }
   } catch (err) {
     console.error("Auth check failed:", err);
-    State.user = null;
-    updateNavbar(false);
+    if (!State.user) {
+      updateNavbar(false);
+    }
   }
 }
 
@@ -244,6 +278,30 @@ function initLoginPage() {
       const data = await res.json();
       if (res.ok) {
         localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Update/save user in local_users cache with plain text password for serverless sync restoration
+        const localUsers = JSON.parse(localStorage.getItem('local_users') || '[]');
+        const existingIdx = localUsers.findIndex(u => u.email === data.user.email);
+        const userDetails = {
+          id: data.user.id,
+          name: data.user.name,
+          email: data.user.email,
+          password: password,
+          role: data.user.role || 'citizen',
+          points: data.user.points || 0,
+          trust_score: data.user.trust_score || 100,
+          trust_level: data.user.trust_level || 'Trusted Citizen',
+          badges: data.user.badges || [],
+          created_at: data.user.created_at || new Date().toISOString()
+        };
+        
+        if (existingIdx >= 0) {
+          localUsers[existingIdx] = userDetails;
+        } else {
+          localUsers.push(userDetails);
+        }
+        localStorage.setItem('local_users', JSON.stringify(localUsers));
+        
         window.location.href = data.user.role === 'citizen' ? '/citizen.html' : '/authority.html';
       } else {
         alert("Login failed: " + data.message);
@@ -272,6 +330,25 @@ function initRegisterPage() {
       const data = await res.json();
       if (res.ok) {
         localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Save user to local_users cache with plain text password for serverless sync restoration
+        const localUsers = JSON.parse(localStorage.getItem('local_users') || '[]');
+        if (!localUsers.some(u => u.email === data.user.email)) {
+          localUsers.push({
+            id: data.user.id,
+            name: data.user.name,
+            email: data.user.email,
+            password: password,
+            role: data.user.role || 'citizen',
+            points: data.user.points || 40,
+            trust_score: 100,
+            trust_level: 'Trusted Citizen',
+            badges: [],
+            created_at: new Date().toISOString()
+          });
+          localStorage.setItem('local_users', JSON.stringify(localUsers));
+        }
+        
         alert("Account created successfully!");
         window.location.href = '/citizen.html';
       } else {
@@ -281,7 +358,7 @@ function initRegisterPage() {
       alert("Error: " + err);
     }
   });
-}
+};
 
 
 // =====================================================================

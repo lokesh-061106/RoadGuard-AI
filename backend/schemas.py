@@ -1,14 +1,29 @@
-from pydantic import BaseModel, EmailStr, Field, field_validator
+import re
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List
 
 class UserRegister(BaseModel):
     name: str = Field(..., min_length=2, max_length=50, description="The user's full name")
-    email: EmailStr = Field(..., description="A valid email address")
+    email: str = Field(..., description="A valid email address")
     password: str = Field(..., min_length=6, description="Password (min 6 characters)")
 
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        if not re.match(r"^[^@]+@[^@]+\.[^@]+$", v):
+            raise ValueError('Invalid email format')
+        return v
+
 class UserLogin(BaseModel):
-    email: EmailStr = Field(..., description="User email address")
+    email: str = Field(..., description="User email address")
     password: str = Field(..., description="User password")
+
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        if not re.match(r"^[^@]+@[^@]+\.[^@]+$", v):
+            raise ValueError('Invalid email format')
+        return v
 
 class IncidentSubmission(BaseModel):
     description: str = Field(..., min_length=10, max_length=500, description="Detailed description of the issue")
