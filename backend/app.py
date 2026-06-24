@@ -1,6 +1,13 @@
 import os
+import sys
 import uuid
 import datetime
+
+# Add the backend directory to python path for relative serverless imports
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
 from flask import Flask, request, jsonify, session, Response, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
