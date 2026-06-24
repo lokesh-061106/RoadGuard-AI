@@ -22,7 +22,7 @@ import seed_data
 # Initialize Flask app
 # Configure static folder to point to the frontend directory
 base_dir = os.path.dirname(os.path.abspath(__file__))
-frontend_dir = os.path.join(os.path.dirname(base_dir), 'frontend')
+frontend_dir = os.path.join(base_dir, 'frontend')
 app = Flask(__name__, static_folder=frontend_dir, static_url_path='')
 
 # Configuration

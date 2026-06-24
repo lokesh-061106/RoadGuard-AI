@@ -13,4 +13,4 @@ ENV/
 Thumbs.db
 
 # Uploads and temporary assets
-frontend/static/uploads/report_*
+backend/frontend/static/uploads/report_*
