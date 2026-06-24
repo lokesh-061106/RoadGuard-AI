@@ -30,12 +30,35 @@ const State = {
 };
 
 // Initialization on DOM Content Loaded
-document.addEventListener('DOMContentLoaded', async () => {
-  await checkAuthStatus();
-  if (State.user) {
-    syncLocalIncidentsWithServer();
+document.addEventListener('DOMContentLoaded', () => {
+  // Pre-load user session state synchronously from localStorage cache
+  const localUserStr = localStorage.getItem('user');
+  if (localUserStr) {
+    try {
+      State.user = JSON.parse(localUserStr);
+    } catch (e) {
+      localStorage.removeItem('user');
+    }
   }
+
+  // If user is already logged in, redirect away from guest login/register pages
+  if (State.user) {
+    const path = window.location.pathname.toLowerCase().replace('.html', '');
+    if (path === '/login' || path === '/register') {
+      window.location.href = '/citizen.html';
+      return;
+    }
+  }
+
+  // Instantly bind forms and page logic
   routePageLogic();
+
+  // Perform background server auth checks
+  checkAuthStatus().then(() => {
+    if (State.user) {
+      syncLocalIncidentsWithServer();
+    }
+  });
 });
 
 // =====================================================================
