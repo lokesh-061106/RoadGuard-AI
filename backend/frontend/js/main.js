@@ -141,9 +141,10 @@ function updateNavbar(isLoggedIn) {
   }
 
   // Set active link highlighting
-  const currentPath = window.location.pathname;
+  const currentPath = window.location.pathname.toLowerCase().replace('.html', '');
   document.querySelectorAll('.nav-link').forEach(link => {
-    if (link.getAttribute('href') === currentPath) {
+    const href = (link.getAttribute('href') || '').toLowerCase().replace('.html', '');
+    if (href === currentPath) {
       link.classList.add('active');
     } else {
       link.classList.remove('active');
@@ -169,31 +170,31 @@ async function handleLogout() {
 // =====================================================================
 
 function routePageLogic() {
-  const path = window.location.pathname;
+  const path = window.location.pathname.toLowerCase().replace('.html', '');
   
-  if (path === '/login.html') {
+  if (path === '/login') {
     initLoginPage();
-  } else if (path === '/register.html') {
+  } else if (path === '/register') {
     initRegisterPage();
-  } else if (path === '/report.html') {
+  } else if (path === '/report') {
     initReportPage();
-  } else if (path === '/monitoring.html') {
+  } else if (path === '/monitoring') {
     initMonitoringPage();
-  } else if (path === '/citizen.html') {
+  } else if (path === '/citizen') {
     initCitizenDashboard();
-  } else if (path === '/rewards.html') {
+  } else if (path === '/rewards') {
     initRewardsPage();
-  } else if (path === '/leaderboard.html') {
+  } else if (path === '/leaderboard') {
     initLeaderboardPage();
-  } else if (path === '/authority.html') {
+  } else if (path === '/authority') {
     initAuthorityPage();
-  } else if (path === '/analytics.html') {
+  } else if (path === '/analytics') {
     initAnalyticsPage();
-  } else if (path === '/tracker.html') {
+  } else if (path === '/tracker') {
     initTrackerPage();
-  } else if (path === '/admin.html') {
+  } else if (path === '/admin') {
     initAdminPage();
-  } else if (path === '/profile.html') {
+  } else if (path === '/profile') {
     initProfilePage();
   }
 }
