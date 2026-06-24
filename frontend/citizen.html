@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Citizen Dashboard - RoadGuard AI</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="/" class="nav-brand">🛡️ RoadGuard <span>AI</span></a>
+        <ul class="nav-menu" id="nav-menu-links"></ul>
+        <div class="nav-auth" id="nav-auth-container"></div>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1 class="page-title">Citizen Dashboard</h1>
+        <p class="page-subtitle">Track your civic contributions and watch your community build.</p>
+      </div>
+
+      <!-- Stat widget cards -->
+      <div class="stat-grid">
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">🪙</div>
+          <div class="stat-info">
+            <h3 id="citizen-points-val">0</h3>
+            <p>Contribution Points</p>
+          </div>
+        </div>
+        
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-info">
+            <h3 id="citizen-level-val">Citizen Surveyor</h3>
+            <p>Civic Level</p>
+          </div>
+        </div>
+
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">🎖️</div>
+          <div class="stat-info">
+            <h3 id="citizen-badges-count">0</h3>
+            <p>Earned Badges</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Main left column: recent reports list -->
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3 style="font-weight:700; font-size:1.3rem;">Your Incident Submissions</h3>
+            <a href="/report.html" class="btn btn-primary" style="padding:0.5rem 1rem; font-size:0.88rem;">+ Report New Issue</a>
+          </div>
+          
+          <div class="report-list" id="citizen-reports-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Sidebar column: badges and navigation guides -->
+        <div>
+          <div class="glass-panel" style="margin-bottom:1.5rem;">
+            <h3 style="font-weight:700; font-size:1.15rem; margin-bottom:1rem;">Achievement Badges</h3>
+            <div class="badges-container" id="dashboard-badges-container">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <div class="glass-panel">
+            <h3 style="font-weight:700; font-size:1.15rem; margin-bottom:1rem;">Quick Actions</h3>
+            <div style="display:grid; gap:0.75rem;">
+              <a href="/rewards.html" class="btn btn-secondary" style="justify-content:flex-start;">🎫 Redeem Rewards</a>
+              <a href="/leaderboard.html" class="btn btn-secondary" style="justify-content:flex-start;">📊 View Leaderboard</a>
+              <a href="/analytics.html" class="btn btn-secondary" style="justify-content:flex-start;">🌍 Smart City Analytics</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Civic Rewards Center - RoadGuard AI</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="/" class="nav-brand">🛡️ RoadGuard <span>AI</span></a>
+        <ul class="nav-menu" id="nav-menu-links"></ul>
+        <div class="nav-auth" id="nav-auth-container"></div>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1 class="page-title">Civic Rewards Ledger</h1>
+        <p class="page-subtitle">Redeem your earned points for simulated smart city coupons, vouchers, and certificates.</p>
+      </div>
+
+      <!-- Point balance container & coupon reveal -->
+      <div style="display:grid; grid-template-columns: 1fr 2fr; gap:1.5rem; margin-bottom:2rem; align-items:start;">
+        <!-- Left: balance widget -->
+        <div class="glass-panel text-center" style="padding:2.5rem 1.5rem;">
+          <div style="font-size:3rem; margin-bottom:0.5rem;">🪙</div>
+          <h2 id="rewards-points-balance" style="font-size:3rem; font-weight:800; color:var(--neon-amber);">0</h2>
+          <p style="color:var(--text-muted); text-transform:uppercase; font-size:0.8rem; letter-spacing:0.5px;">Active Point Balance</p>
+        </div>
+
+        <!-- Right: coupon code reveal panel -->
+        <div class="glass-panel" id="coupon-reveal-box" style="display:none; border-color:var(--neon-teal); animation: fadeIn 0.4s ease;">
+          <h3 style="font-weight:700; color:var(--neon-teal); margin-bottom:0.5rem;">🎟️ Reward Claimed Successfully</h3>
+          <p id="revealed-coupon-text" style="font-size:0.95rem; margin-bottom:1rem;"></p>
+          <div style="background:rgba(5, 249, 226, 0.1); border:1px dashed var(--neon-teal); padding:1rem; border-radius:10px; text-align:center; font-family:var(--font-mono); font-size:1.4rem; font-weight:800; color:#fff; letter-spacing:2px; margin-bottom:0.5rem;" id="revealed-coupon-code">
+            CODE-XXXX
+          </div>
+          <p style="font-size:0.75rem; color:var(--text-muted); text-align:center; font-weight:600; text-transform:uppercase;">
+            ⚠️ DEMO ONLY — No real government utility integration.
+          </p>
+        </div>
+      </div>
+
+      <!-- Marketplace catalog section -->
+      <h3 style="font-weight:700; font-size:1.4rem; margin-bottom:1.5rem;">Voucher Marketplace <span style="font-size:0.8rem; font-weight:400; color:var(--text-muted); border:1px solid var(--border-glass); padding:0.2rem 0.5rem; border-radius:30px; margin-left:0.5rem;">SIMULATED</span></h3>
+      
+      <div class="rewards-grid" style="margin-bottom:3rem;">
+        <!-- Card 1 -->
+        <div class="glass-panel reward-card">
+          <div style="font-size:2.2rem;">🏛️</div>
+          <h4 style="font-weight:700; margin-top:0.75rem;">National Museum Ticket</h4>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.25rem;">Single entry pass to all exhibits.</p>
+          <div class="reward-cost">40 Points</div>
+          <button onclick="redeemItem('rwd_museum')" class="btn btn-primary" style="width:100%; font-size:0.85rem;">Redeem Ticket</button>
+        </div>
+        
+        <!-- Card 2 -->
+        <div class="glass-panel reward-card">
+          <div style="font-size:2.2rem;">🐅</div>
+          <h4 style="font-weight:700; margin-top:0.75rem;">Tourism Zoo Entry Pass</h4>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.25rem;">One adult general entry pass.</p>
+          <div class="reward-cost">50 Points</div>
+          <button onclick="redeemItem('rwd_zoo')" class="btn btn-primary" style="width:100%; font-size:0.85rem;">Redeem Ticket</button>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="glass-panel reward-card">
+          <div style="font-size:2.2rem;">🚇</div>
+          <h4 style="font-weight:700; margin-top:0.75rem;">$10 Metro Travel Credit</h4>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.25rem;">Public transit fare top-up card.</p>
+          <div class="reward-cost">80 Points</div>
+          <button onclick="redeemItem('rwd_metro')" class="btn btn-primary" style="width:100%; font-size:0.85rem;">Redeem Credit</button>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="glass-panel reward-card">
+          <div style="font-size:2.2rem;">🚆</div>
+          <h4 style="font-weight:700; margin-top:0.75rem;">50% Railway Coupon</h4>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.25rem;">Half-price discount voucher code.</p>
+          <div class="reward-cost">100 Points</div>
+          <button onclick="redeemItem('rwd_rail')" class="btn btn-primary" style="width:100%; font-size:0.85rem;">Redeem Coupon</button>
+        </div>
+      </div>
+
+      <!-- Transaction Log History -->
+      <h3 style="font-weight:700; font-size:1.4rem; margin-bottom:1rem;">Your Point Transactions</h3>
+      <div class="glass-panel" style="padding:0; overflow-x:auto;">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>Transaction ID</th>
+              <th>Date & Time</th>
+              <th>Points Delta</th>
+              <th>Details / Reason</th>
+            </tr>
+          </thead>
+          <tbody id="rewards-history-table">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

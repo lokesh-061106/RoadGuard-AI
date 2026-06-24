@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - RoadGuard AI</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="/" class="nav-brand">🛡️ RoadGuard <span>AI</span></a>
+        <ul class="nav-menu" id="nav-menu-links"></ul>
+        <div class="nav-auth" id="nav-auth-container"></div>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1 class="page-title">System Admin Center</h1>
+        <p class="page-subtitle">Configure system policies, monitor agent workflows, and review platform performance metrics.</p>
+      </div>
+
+      <!-- Stat widget cards -->
+      <div class="stat-grid" style="margin-bottom:2rem;">
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <h3 id="admin-stat-users">0</h3>
+            <p>Total Accounts</p>
+          </div>
+        </div>
+        
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">👤</div>
+          <div class="stat-info">
+            <h3 id="admin-stat-citizens">0</h3>
+            <p>Active Citizens</p>
+          </div>
+        </div>
+
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-info">
+            <h3 id="admin-stat-reports">0</h3>
+            <p>Total Reports</p>
+          </div>
+        </div>
+
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">🪙</div>
+          <div class="stat-info">
+            <h3 id="admin-stat-points">0</h3>
+            <p>Points Allocated</p>
+          </div>
+        </div>
+
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">🎫</div>
+          <div class="stat-info">
+            <h3 id="admin-stat-redemptions">0</h3>
+            <p>Redemptions</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Reward policy settings -->
+        <div class="glass-panel">
+          <h3 style="font-weight:700; font-size:1.3rem; margin-bottom:1rem;">Rewards System Policies</h3>
+          <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">Configure the point awards multiplier for verified infrastructure submissions.</p>
+          
+          <div class="form-group">
+            <label class="form-label">Low Severity Verified Issue</label>
+            <input type="number" class="form-input" value="10" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Medium Severity Verified Issue</label>
+            <input type="number" class="form-input" value="25" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">High Severity Verified Issue</label>
+            <input type="number" class="form-input" value="50" readonly>
+          </div>
+          <div class="form-group" style="margin-bottom:2rem;">
+            <label class="form-label">Critical Infrastructure Issue</label>
+            <input type="number" class="form-input" value="100" readonly>
+          </div>
+          <button class="btn btn-primary" style="width:100%;" onclick="alert('Policies are locked in production-grade Kaggle Mode.')">Save Policy Settings</button>
+        </div>
+
+        <!-- Database & Logs backup controls -->
+        <div class="glass-panel">
+          <h3 style="font-weight:700; font-size:1.3rem; margin-bottom:1rem;">System Operations</h3>
+          <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">Orchestrate maintenance scripts for the JSON/MongoDB databases and model contexts.</p>
+          
+          <div style="display:grid; gap:1rem;">
+            <button class="btn btn-secondary" onclick="alert('JSON database backup created successfully in backend/db/backups/')">📦 Backup JSON Database</button>
+            <button class="btn btn-secondary" onclick="alert('Caching completed. 4 active reports refreshed.')">⚡ Rebuild Hotspot Cache</button>
+            <button class="btn btn-danger" onclick="alert('Cannot clear logs. Read-only demo logs are protected.')">🗑️ Purge System Audit Logs</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>
