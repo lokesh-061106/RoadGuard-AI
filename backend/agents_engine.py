@@ -1,6 +1,14 @@
 import os
 import json
 import time
+
+# Override time.sleep dynamically under Vercel serverless environment to prevent Gateway Timeouts
+if os.environ.get("VERCEL") == "1":
+    _original_sleep = time.sleep
+    def vercel_sleep(seconds):
+        _original_sleep(0.01)
+    time.sleep = vercel_sleep
+
 import random
 import datetime
 from typing import Dict, Any, Generator
