@@ -96,7 +96,7 @@ def register():
     db.write('rewards', rewards)
 
     # Automatically update leaderboard rank list
-    import mcp.mcp_server as mcp_tools
+    import mcp_services.mcp_server as mcp_tools
     mcp_tools.update_leaderboard_cache()
 
     session['user_id'] = user_id
@@ -353,7 +353,7 @@ def update_incident_status(id):
     db.write('workorders', workorders)
 
     # Re-run governance metrics updates
-    import mcp.mcp_server as mcp_tools
+    import mcp_services.mcp_server as mcp_tools
     mcp_tools.generate_city_analytics()
 
     return jsonify({"status": "success", "message": f"Incident state set to {data.status}"}), 200
@@ -369,7 +369,7 @@ def get_my_rewards():
     if not user_id:
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
         
-    import mcp.mcp_server as mcp_tools
+    import mcp_services.mcp_server as mcp_tools
     res = mcp_tools.get_user_rewards(user_id)
     return jsonify(res), 200
 
@@ -428,7 +428,7 @@ def redeem_reward():
     db.write('rewards', rewards)
 
     # Re-cache ranking profiles
-    import mcp.mcp_server as mcp_tools
+    import mcp_services.mcp_server as mcp_tools
     mcp_tools.update_leaderboard_cache()
 
     return jsonify({
@@ -441,13 +441,13 @@ def redeem_reward():
 
 @app.route('/api/leaderboard', methods=['GET'])
 def get_leaderboard_api():
-    import mcp.mcp_server as mcp_tools
+    import mcp_services.mcp_server as mcp_tools
     board = mcp_tools.get_leaderboard()
     return jsonify(board), 200
 
 @app.route('/api/analytics', methods=['GET'])
 def get_analytics_api():
-    import mcp.mcp_server as mcp_tools
+    import mcp_services.mcp_server as mcp_tools
     stats = mcp_tools.generate_city_analytics()
     return jsonify(stats), 200
 

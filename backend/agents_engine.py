@@ -7,7 +7,7 @@ import google.generativeai as genai
 
 # Import database manager directly for client simulation
 from db_manager import db
-import mcp.mcp_server as mcp_tools
+import mcp_services.mcp_server as mcp_tools
 
 # Configure Gemini if API key is present
 api_key = os.environ.get("GEMINI_API_KEY")

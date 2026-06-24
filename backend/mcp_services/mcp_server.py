@@ -22,26 +22,19 @@ def get_location_context(latitude: float, longitude: float) -> dict:
     Retrieve location-specific metadata including traffic density, school zone status, 
     road category, population density, and local accident history statistics.
     """
-    # Deterministic simulation based on coordinate hashes to represent real geographic mapping
     lat_hash = int(abs(latitude) * 10000)
     lon_hash = int(abs(longitude) * 10000)
     hash_val = lat_hash + lon_hash
 
-    # Assign road category
     road_cats = ["National Highway", "State Highway", "Arterial Road", "Local Road"]
     road_category = road_cats[hash_val % len(road_cats)]
 
-    # Traffic Density
     traffic_densities = ["Low", "Medium", "High"]
     traffic_density = traffic_densities[(hash_val // 2) % len(traffic_densities)]
 
-    # School Zone Status
     school_zone = (hash_val % 7) == 0
-
-    # Accident History Count
     accident_history_count = (hash_val % 11)
 
-    # Population Density
     pop_densities = ["Low", "Medium", "High", "Very High"]
     population_density = pop_densities[(hash_val // 3) % len(pop_densities)]
 
@@ -61,7 +54,6 @@ def save_incident(incident_data: dict) -> dict:
     """
     incidents = db.read('incidents', default=[])
     
-    # Check if this is an update or a new insert
     incident_id = incident_data.get("id")
     found_idx = -1
     for idx, inc in enumerate(incidents):
@@ -72,11 +64,9 @@ def save_incident(incident_data: dict) -> dict:
     current_time = datetime.datetime.utcnow().isoformat() + "Z"
     
     if found_idx >= 0:
-        # Update existing
         incident_data["updated_at"] = current_time
         incidents[found_idx] = incident_data
     else:
-        # Create new
         incident_data["created_at"] = current_time
         incident_data["updated_at"] = current_time
         incidents.append(incident_data)
@@ -114,12 +104,10 @@ def award_reward_points(user_id: str, points: int, reason: str) -> dict:
     if not user_found:
         return {"status": "error", "message": "User not found"}
 
-    # Update points
     old_points = user_found.get("points", 0)
     new_points = old_points + points
     user_found["points"] = new_points
 
-    # Evaluate new badges based on point milestones
     badges = user_found.get("badges", [])
     new_badge = None
     badge_milestones = [
@@ -129,7 +117,6 @@ def award_reward_points(user_id: str, points: int, reason: str) -> dict:
         (1000, "Smart City Champion")
     ]
     
-    # Ensure "Road Protector" is given for their first report
     if points > 0 and len(badges) == 0:
         new_badge = "Road Protector"
         badges.append(new_badge)
@@ -142,7 +129,6 @@ def award_reward_points(user_id: str, points: int, reason: str) -> dict:
     user_found["badges"] = badges
     db.write('users', users)
 
-    # Log transaction
     tx_id = f"tx_{int(datetime.datetime.utcnow().timestamp() * 1000)}"
     transaction = {
         "id": tx_id,
@@ -155,7 +141,6 @@ def award_reward_points(user_id: str, points: int, reason: str) -> dict:
     rewards.append(transaction)
     db.write('rewards', rewards)
 
-    # Update Leaderboard Cache
     update_leaderboard_cache()
 
     return {
@@ -203,7 +188,6 @@ def generate_city_analytics() -> dict:
     distribution, hot-spots, average risk indices, and budget predictions.
     """
     incidents = db.read('incidents', default=[])
-    workorders = db.read('workorders', default=[])
     
     total = len(incidents)
     resolved = sum(1 for inc in incidents if inc.get("status") == "resolved")
@@ -217,29 +201,24 @@ def generate_city_analytics() -> dict:
     category_dist = {}
     hotspots = []
     
-    # Calculate costs
     total_spent = 0
     estimated_outstanding = 0
 
     for inc in incidents:
-        # Severity
         det = inc.get("detection", {})
         sev = det.get("severity", "Low")
         if sev in severity_dist:
             severity_dist[sev] += 1
             
-        # Category
         cat = det.get("category", "Uncategorized")
         category_dist[cat] = category_dist.get(cat, 0) + 1
 
-        # Risk
         risk_data = inc.get("risk", {})
         r_score = risk_data.get("risk_score")
         if r_score is not None:
             risk_sum += r_score
             risk_count += 1
 
-        # Hotspots mapping (filter to active high-risk)
         weight = (r_score / 100.0) if r_score else 0.5
         hotspots.append({
             "latitude": inc.get("latitude"),
@@ -248,7 +227,6 @@ def generate_city_analytics() -> dict:
             "description": f"{det.get('damage_type', 'Damage')} ({sev})"
         })
 
-        # Repair cost summing
         rep = inc.get("repair", {})
         cost_str = rep.get("estimated_cost", "$0").replace('$', '').replace(',', '')
         try:
@@ -300,7 +278,6 @@ def detect_duplicate_reports(latitude: float, longitude: float, damage_type: str
     incidents = db.read('incidents', default=[])
     
     def haversine_distance(lat1, lon1, lat2, lon2):
-        # Radius of the Earth in meters
         R = 6371000
         phi1 = math.radians(lat1)
         phi2 = math.radians(lat2)
@@ -312,12 +289,11 @@ def detect_duplicate_reports(latitude: float, longitude: float, damage_type: str
         return R * c
 
     duplicates = []
-    # Maximum matching distance threshold in meters
     THRESHOLD_METERS = 50.0
 
     for inc in incidents:
         if inc.get("status") == "resolved":
-            continue # Resolved issues can be reported again if they reoccur
+            continue
             
         det = inc.get("detection", {})
         cur_type = det.get("damage_type", "").lower()
