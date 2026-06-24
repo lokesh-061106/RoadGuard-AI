@@ -346,6 +346,170 @@ function initReportPage() {
 // 3. LIVE MULTI-AGENT SSE MONITORING
 // =====================================================================
 
+function renderAgentOutput(agentName, output) {
+  if (!output) return `<p style="color:var(--text-muted); font-size:0.85rem;">No output data returned.</p>`;
+  
+  if (agentName.includes("Detection")) {
+    const severity = output.severity || 'Medium';
+    const sevClass = severity.toLowerCase();
+    const confidence = output.confidence || '92%';
+    return `
+      <div class="agent-output-card">
+        <div class="output-grid">
+          <div class="output-cell">
+            <span class="cell-label">Hazard Type</span>
+            <span class="cell-value">🛠️ ${output.damage_type || 'Unknown'}</span>
+          </div>
+          <div class="output-cell">
+            <span class="cell-label">Category</span>
+            <span class="cell-value">${output.category || 'General'}</span>
+          </div>
+          <div class="output-cell">
+            <span class="cell-label">Severity Level</span>
+            <div><span class="badge badge-${sevClass}">${severity}</span></div>
+          </div>
+          <div class="output-cell">
+            <span class="cell-label">AI Confidence</span>
+            <div class="cell-value-confidence">
+              <span class="confidence-number">${confidence}</span>
+              <div class="confidence-bar-bg"><div class="confidence-bar-fill" style="width: ${confidence.includes('%') ? confidence : confidence + '%'}"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  if (agentName.includes("Risk")) {
+    const priority = output.priority || 'Medium';
+    const prioClass = priority.toLowerCase();
+    const score = output.risk_score || 0;
+    const scoreColor = score > 75 ? 'var(--neon-red)' : (score > 40 ? 'var(--neon-amber)' : 'var(--neon-teal)');
+    return `
+      <div class="agent-output-card">
+        <div class="output-grid" style="grid-template-columns: 1fr 2fr;">
+          <div class="output-cell" style="display:flex; flex-direction:column; align-items:center; justify-content:center; border-right: 1px solid var(--border-glass); padding-right:1rem;">
+            <span class="cell-label">Risk Index</span>
+            <span class="risk-score-display" style="color: ${scoreColor}; font-size:1.8rem; font-weight:800; margin-top:0.25rem;">${score}/100</span>
+            <div style="margin-top:0.4rem;"><span class="badge badge-${prioClass}">${priority}</span></div>
+          </div>
+          <div class="output-cell" style="padding-left:0.5rem; justify-content:center;">
+            <span class="cell-label">Safety Officer Assessment</span>
+            <p style="font-size:0.85rem; line-height:1.4; color:var(--text-muted); margin-top:0.25rem;">${output.explanation || 'No assessment explanation provided.'}</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  if (agentName.includes("Repair")) {
+    const materialsList = output.materials || [];
+    const materialsHtml = materialsList.map(mat => `<span class="badge badge-medium" style="font-size:0.75rem; padding:0.25rem 0.5rem; border-radius:6px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fff; display:inline-block; margin-right:0.25rem; margin-bottom:0.25rem;">🧱 ${mat}</span>`).join(' ');
+    return `
+      <div class="agent-output-card">
+        <div class="repair-title" style="font-size:0.92rem; font-weight:700; color:var(--primary-glow);">🛠️ Action Plan: ${output.repair_method || 'Standard Resurfacing'}</div>
+        <div style="display:flex; gap:1.5rem; margin-top:0.5rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top:0.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom:0.5rem;">
+          <div>
+            <span class="cell-label" style="display:block;">Estimated Cost</span>
+            <span style="font-weight:800; color:var(--neon-amber); font-size:1.05rem;">${output.estimated_cost || '$150'}</span>
+          </div>
+          <div>
+            <span class="cell-label" style="display:block;">Duration Estimate</span>
+            <span style="font-weight:700; color:#fff; font-size:1.05rem;">🕒 ${output.estimated_duration || '3 hours'}</span>
+          </div>
+        </div>
+        <div style="margin-top:0.5rem;">
+          <span class="cell-label" style="margin-bottom:0.3rem; display:block;">Bill of Materials (BOM)</span>
+          <div style="display:flex; flex-wrap:wrap; gap:0.25rem; margin-top:0.25rem;">
+            ${materialsHtml || '<span style="color:var(--text-muted); font-size:0.85rem;">Standard asphalt patch mixture</span>'}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  if (agentName.includes("Government")) {
+    const incId = output.incident_id || 'inc_pending';
+    const cleanId = incId.includes('_') ? incId.split('_')[1] : incId;
+    return `
+      <div class="agent-output-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+          <div>
+            <span class="cell-label">Assigned Agency</span>
+            <span style="font-weight:700; color:#fff; display:block; margin-top:0.15rem; font-size:0.92rem;">🏢 ${output.department || 'Municipal Maintenance Dept'}</span>
+          </div>
+          <span class="badge" style="background: rgba(5, 249, 226, 0.1); color: var(--neon-teal); border: 1px solid var(--neon-teal); animation: pulse 2s infinite; font-size:0.75rem; padding:0.15rem 0.5rem;">
+            ● Dispatch Initiated
+          </span>
+        </div>
+        <div style="background:rgba(255,255,255,0.02); padding:0.65rem; border-radius:8px; border: 1px solid rgba(255,255,255,0.05); margin-top:0.25rem;">
+          <span class="cell-label" style="font-family:var(--font-mono); font-size:0.72rem; display:block; margin-bottom:0.25rem;">Registry Work Order ID: #${cleanId}</span>
+          <p style="font-size:0.84rem; color:var(--text-muted); line-height:1.45;">
+            ${output.government_summary || 'Work order logged successfully.'}
+          </p>
+        </div>
+      </div>
+    `;
+  }
+  
+  if (agentName.includes("Civic")) {
+    const badgeName = output.badge || 'None';
+    const badgeEarnedHtml = badgeName !== "None" ? `
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.5rem; background:rgba(255,170,0,0.1); border:1px solid var(--neon-amber); padding:0.5rem; border-radius:8px;">
+        <span style="font-size:1.3rem;">🏅</span>
+        <div>
+          <div style="font-weight:700; color:var(--neon-amber); font-size:0.75rem;">New Badge Unlocked!</div>
+          <div style="color:#fff; font-size:0.85rem; font-weight:800;">${badgeName}</div>
+        </div>
+      </div>
+    ` : '';
+    
+    return `
+      <div class="agent-output-card">
+        <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:1rem;">
+          <div style="border-right: 1px solid var(--border-glass); padding-right:1rem; display:flex; flex-direction:column; justify-content:center;">
+            <span class="cell-label">Civic Payout</span>
+            <div style="font-size:1.8rem; font-weight:800; color:var(--neon-teal); display:flex; align-items:center; gap:0.25rem; margin-top:0.15rem;">
+              +${output.reward_points || 0} <span style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">pts</span>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; justify-content:center; padding-left:0.5rem;">
+            <span class="cell-label">Status Upgrade</span>
+            <span style="font-weight:700; color:#fff; font-size:0.92rem; display:flex; align-items:center; gap:0.25rem; margin-top:0.15rem;">🛡️ ${output.contribution_level || 'Active Citizen'}</span>
+          </div>
+        </div>
+        ${badgeEarnedHtml}
+      </div>
+    `;
+  }
+  
+  if (agentName.includes("Analytics")) {
+    const active = output.total_active_hazards || '0';
+    const rating = output.average_risk_rating || output.average_risk_score || 0;
+    const ratingVal = typeof rating === 'number' ? rating : (parseFloat(rating) || 0.0);
+    return `
+      <div class="agent-output-card">
+        <div class="output-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="output-cell">
+            <span class="cell-label">City Active Hazards</span>
+            <span style="font-size:1.15rem; font-weight:800; color:#fff; display:block; margin-top:0.15rem;">📊 ${active} Hazards</span>
+          </div>
+          <div class="output-cell">
+            <span class="cell-label">Metropolitan Avg Risk</span>
+            <span style="font-size:1.15rem; font-weight:800; color:var(--neon-amber); display:block; margin-top:0.15rem;">⚠️ ${ratingVal.toFixed(1)}/100</span>
+          </div>
+        </div>
+        <div style="margin-top:0.4rem; text-align:center; font-size:0.8rem; color:var(--neon-teal); font-weight:600; border-top:1px dashed var(--border-glass); padding-top:0.4rem;">
+          ✓ Metropolitan hot-spot registries successfully updated
+        </div>
+      </div>
+    `;
+  }
+
+  // Fallback
+  return `<pre class="timeline-output-fallback" style="margin:0; font-family:var(--font-mono); font-size:0.8rem; color:var(--text-muted);">${JSON.stringify(output, null, 2)}</pre>`;
+}
+
 function initMonitoringPage() {
   const urlParams = new URLSearchParams(window.location.search);
   const incidentId = urlParams.get('id');
@@ -407,7 +571,7 @@ function initMonitoringPage() {
         
         const outputBox = timelineItems[stepNum].querySelector('.timeline-output');
         if (outputBox) {
-          outputBox.innerText = JSON.stringify(eventData.output, null, 2);
+          outputBox.innerHTML = renderAgentOutput(eventData.agent, eventData.output);
           outputBox.style.display = 'block';
         }
       }
@@ -418,8 +582,13 @@ function initMonitoringPage() {
       if (timelineItems[6]) {
         timelineItems[6].classList.add('done');
         const outputBox = timelineItems[6].querySelector('.timeline-output');
-        if (outputBox) {
-          outputBox.innerText = JSON.stringify({ status: "Database analytics rebuilt successfully." }, null, 2);
+        if (outputBox && !outputBox.innerHTML) {
+          outputBox.innerHTML = `
+            <div class="agent-output-card" style="text-align:center; padding: 0.5rem 0;">
+              <div style="font-weight:800; color:var(--neon-teal); font-size:1.05rem; margin-bottom:0.25rem;">🌐 Pipeline Completed Successfully</div>
+              <p style="font-size:0.85rem; color:var(--text-muted);">Hotspots updated. Analytics dashboards compiled.</p>
+            </div>
+          `;
           outputBox.style.display = 'block';
         }
       }

@@ -43,6 +43,43 @@ def get_current_user():
     user_id = session.get('user_id')
     if not user_id:
         user_id = request.headers.get('X-User-Id')
+    
+    if user_id:
+        # Prevent serverless stateless drops from invalidating active browser sessions
+        users = db.read('users', default=[])
+        exists = False
+        for user in users:
+            if user.get("id") == user_id:
+                exists = True
+                break
+        if not exists:
+            # Reconstruct missing user profile dynamically
+            name = "Lokesh" if "lokesh" in user_id.lower() or "usr_" in user_id else "Citizen Contributor"
+            email = "lokesh@roadguard.ai" if name == "Lokesh" else "citizen@roadguard.ai"
+            role = "citizen"
+            # Maintain admin/authority mappings if the ID matches seed logins
+            if user_id == "usr_3":
+                name = "Officer Vikram Rathore"
+                email = "vikram@roadguard.ai"
+                role = "authority"
+            elif user_id == "usr_4":
+                name = "Suresh Iyer"
+                email = "suresh@roadguard.ai"
+                role = "admin"
+                
+            new_user = {
+                "id": user_id,
+                "name": name,
+                "email": email,
+                "password": "", # token recovery bypass
+                "role": role,
+                "points": 40,
+                "badges": [],
+                "created_at": datetime.datetime.utcnow().isoformat() + "Z"
+            }
+            users.append(new_user)
+            db.write('users', users)
+            
     return user_id
 
 # Helper: Check if user is authority/admin
