@@ -29,6 +29,38 @@
         <div class="glass-panel">
           <form id="report-form" enctype="multipart/form-data">
             <div class="form-group">
+              <label class="form-label">Select CivicGuard Module</label>
+              <div class="module-selector-grid">
+                <div class="module-card active" data-module="road">
+                  <div class="module-card-icon">🚗</div>
+                  <div class="module-card-title">RoadGuard</div>
+                  <div class="module-card-desc">Potholes, cracks, lighting, signage</div>
+                </div>
+                <div class="module-card" data-module="water">
+                  <div class="module-card-icon">💧</div>
+                  <div class="module-card-title">WaterGuard</div>
+                  <div class="module-card-desc">Leaks, pipeline bursts, contamination</div>
+                </div>
+                <div class="module-card" data-module="environment">
+                  <div class="module-card-icon">🌳</div>
+                  <div class="module-card-title">EnvironmentGuard</div>
+                  <div class="module-card-desc">Illegal dumping, air/water pollution</div>
+                </div>
+                <div class="module-card" data-module="cleancity">
+                  <div class="module-card-icon">🧹</div>
+                  <div class="module-card-title">CleanCity</div>
+                  <div class="module-card-desc">Garbage piles, public sanitation</div>
+                </div>
+                <div class="module-card" data-module="asset">
+                  <div class="module-card-icon">🪑</div>
+                  <div class="module-card-title">AssetGuard</div>
+                  <div class="module-card-desc">Broken benches, parks, streetlights</div>
+                </div>
+              </div>
+              <input type="hidden" id="module-input" value="road">
+            </div>
+
+            <div class="form-group">
               <label class="form-label">Upload Damage Image</label>
               <div class="upload-zone" id="upload-zone">
                 <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">📷</div>

@@ -38,9 +38,22 @@
               <p id="profile-email" style="font-size:1.1rem; font-weight:500;">arjun@roadguard.ai</p>
             </div>
             
-            <div class="form-group" style="margin-bottom:0;">
+            <div class="form-group" style="margin-bottom: 1rem;">
               <label class="form-label" style="color:var(--text-muted);">Total Point Balance</label>
               <p style="font-size:1.5rem; font-weight:800; color:var(--neon-amber);"><span id="profile-points">0</span> Points</p>
+            </div>
+
+            <div class="form-group" style="margin-bottom:0; width: 100%;">
+              <label class="form-label" style="color:var(--text-muted);">Civic Trust Status</label>
+              <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.25rem;">
+                <span style="font-size:1.5rem; font-weight:800; color:var(--neon-teal);" id="profile-trust-val">100</span>
+                <span id="profile-trust-badge" class="trust-badge-label trust-badge-trusted" style="font-size: 0.75rem;">Trusted Citizen</span>
+              </div>
+              <div class="trust-gauge-container" style="margin-top:0.5rem; max-width: 250px;">
+                <div class="trust-gauge-bar-bg">
+                  <div id="profile-trust-fill" class="trust-gauge-bar-fill trusted" style="width: 100%;"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

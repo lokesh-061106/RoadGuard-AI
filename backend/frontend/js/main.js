@@ -271,6 +271,33 @@ function initReportPage() {
     return;
   }
 
+  // Handle Module Cards click selection
+  const moduleCards = document.querySelectorAll('.module-card');
+  const moduleInput = document.getElementById('module-input');
+  const descInput = document.getElementById('desc-input');
+
+  const placeholders = {
+    road: "Describe the severity, exact location details, or safety threats (e.g. Large 4-inch deep pothole in the middle lane causing sudden swerving)...",
+    water: "Describe the water issue, water color/smell, or location (e.g. Clean drinking water pipeline burst at the corner of 5th cross, water pooling on road)...",
+    environment: "Describe environmental concern or pollution source (e.g. Factory dumping dark residue into the local lake inlet during night hours)...",
+    cleancity: "Describe the waste accumulation or public sanitation issue (e.g. Large heap of municipal dry/wet waste piled up on footpath for 3 days)...",
+    asset: "Describe the public asset damage or location (e.g. Bus shelter seat completely broken, streetlight blinking constantly causing darkness)..."
+  };
+
+  if (moduleCards && moduleInput) {
+    moduleCards.forEach(card => {
+      card.addEventListener('click', () => {
+        moduleCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        const selectedModule = card.getAttribute('data-module');
+        moduleInput.value = selectedModule;
+        if (descInput && placeholders[selectedModule]) {
+          descInput.placeholder = placeholders[selectedModule];
+        }
+      });
+    });
+  }
+
   // Setup Leaflet map for coordinate selection
   const defaultLat = 12.9716;
   const defaultLon = 77.5946; // Bengaluru center
@@ -310,72 +337,77 @@ function initReportPage() {
   const fileInput = document.getElementById('file-input');
   const uploadPreview = document.getElementById('upload-preview');
 
-  uploadZone.addEventListener('click', () => fileInput.click());
-  
-  fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        uploadPreview.src = e.target.result;
-        uploadPreview.style.display = 'inline-block';
-      };
-      reader.readAsDataURL(file);
-    }
-  });
+  if (uploadZone && fileInput) {
+    uploadZone.addEventListener('click', () => fileInput.click());
+    
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          uploadPreview.src = e.target.result;
+          uploadPreview.style.display = 'inline-block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
 
   // Submission Form handler
   const form = document.getElementById('report-form');
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const submitBtn = form.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;
-    submitBtn.innerText = "Uploading Incident Asset...";
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Uploading Incident Asset...";
 
-    const formData = new FormData();
-    formData.append('latitude', document.getElementById('lat-input').value);
-    formData.append('longitude', document.getElementById('lon-input').value);
-    formData.append('description', document.getElementById('desc-input').value);
-    formData.append('image', fileInput.files[0]);
+      const formData = new FormData();
+      formData.append('latitude', document.getElementById('lat-input').value);
+      formData.append('longitude', document.getElementById('lon-input').value);
+      formData.append('description', document.getElementById('desc-input').value);
+      formData.append('module', document.getElementById('module-input').value);
+      formData.append('image', fileInput.files[0]);
 
-    try {
-      const res = await fetch('/api/submit-report', {
-        method: 'POST',
-        body: formData
-      });
-      const data = await res.json();
-      if (res.ok) {
-        if (data.events) {
-          sessionStorage.setItem(`telemetry_${data.incident_id}`, JSON.stringify(data.events));
-        }
-        
-        // Construct fallback incident locally if server does not return it (stateless fallback)
-        let incidentToSave = data.incident;
-        if (!incidentToSave) {
-          const latInput = document.getElementById('lat-input');
-          const lonInput = document.getElementById('lon-input');
-          const descInput = document.getElementById('desc-input');
-          incidentToSave = {
-            id: data.incident_id,
-            reporter_id: State.user ? State.user.id : "usr_anonymous",
-            reporter_name: State.user ? State.user.name : "Citizen Contributor",
-            description: descInput ? descInput.value : "",
-            latitude: latInput ? parseFloat(latInput.value) : 12.9716,
-            longitude: lonInput ? parseFloat(lonInput.value) : 77.5946,
-            image_name: (fileInput && fileInput.files[0]) ? fileInput.files[0].name : "pothole.jpg",
-            image_url: (uploadPreview && uploadPreview.src) ? uploadPreview.src : "/static/images/pothole_nh44.jpg",
-            status: "reported",
-            created_at: new Date().toISOString(),
-            risk: {
-              priority: "Medium",
-              explanation: "AI danger assessment is processing..."
-            },
-            detection: {
-              damage_type: "Pothole",
-              category: "Road Damage"
-            }
-          };
-        }
+      try {
+        const res = await fetch('/api/submit-report', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (res.ok) {
+          if (data.events) {
+            sessionStorage.setItem(`telemetry_${data.incident_id}`, JSON.stringify(data.events));
+          }
+          
+          // Construct fallback incident locally if server does not return it (stateless fallback)
+          let incidentToSave = data.incident;
+          if (!incidentToSave) {
+            const latInput = document.getElementById('lat-input');
+            const lonInput = document.getElementById('lon-input');
+            const descInput = document.getElementById('desc-input');
+            incidentToSave = {
+              id: data.incident_id,
+              module: document.getElementById('module-input').value,
+              reporter_id: State.user ? State.user.id : "usr_anonymous",
+              reporter_name: State.user ? State.user.name : "Citizen Contributor",
+              description: descInput ? descInput.value : "",
+              latitude: latInput ? parseFloat(latInput.value) : 12.9716,
+              longitude: lonInput ? parseFloat(lonInput.value) : 77.5946,
+              image_name: (fileInput && fileInput.files[0]) ? fileInput.files[0].name : "pothole.jpg",
+              image_url: (uploadPreview && uploadPreview.src) ? uploadPreview.src : "/static/images/pothole_nh44.jpg",
+              status: "reported",
+              created_at: new Date().toISOString(),
+              risk: {
+                priority: "Medium",
+                explanation: "AI danger assessment is processing..."
+              },
+              detection: {
+                damage_type: "Pothole",
+                category: "Road Damage"
+              }
+            };
+          }
 
         try {
           let localIncidents = JSON.parse(localStorage.getItem('local_incidents') || '[]');
@@ -407,6 +439,53 @@ function initReportPage() {
 
 function renderAgentOutput(agentName, output) {
   if (!output) return `<p style="color:var(--text-muted); font-size:0.85rem;">No output data returned.</p>`;
+  
+  if (agentName.includes("Fraud")) {
+    const status = output.status || 'Verified';
+    let statusClass = 'trust-badge-trusted';
+    if (status.includes("Rejected")) statusClass = 'trust-badge-restricted';
+    else if (status.includes("Flagged")) statusClass = 'trust-badge-monitoring';
+
+    const deduction = output.trust_deduction || 0;
+    const currentScore = output.current_trust_score || 100;
+    const level = output.trust_level || 'Trusted Citizen';
+
+    let barClass = 'trusted';
+    if (currentScore < 50) barClass = 'restricted';
+    else if (currentScore < 70) barClass = 'monitoring';
+    else if (currentScore < 90) barClass = 'verified';
+
+    return `
+      <div class="agent-output-card">
+        <div class="output-grid">
+          <div class="output-cell">
+            <span class="cell-label">Verification Status</span>
+            <div><span class="trust-badge-label ${statusClass}">${status}</span></div>
+          </div>
+          <div class="output-cell">
+            <span class="cell-label">Trust Score Impact</span>
+            <span class="cell-value" style="color:${deduction > 0 ? 'var(--neon-red)' : 'var(--neon-teal)'};">
+              ${deduction > 0 ? '-' + deduction : '0'} pts
+            </span>
+          </div>
+          <div class="output-cell" style="grid-column: span 2;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.25rem;">
+              <span class="cell-label">Citizen Trust Score: <b>${currentScore}/100</b></span>
+              <span class="cell-value" style="font-size:0.8rem;">${level}</span>
+            </div>
+            <div class="trust-gauge-container">
+              <div class="trust-gauge-bar-bg">
+                <div class="trust-gauge-bar-fill ${barClass}" style="width: ${currentScore}%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.4rem; border-top:1px dashed var(--border-glass); padding-top:0.4rem;">
+          🔍 ${output.details || ''}
+        </p>
+      </div>
+    `;
+  }
   
   if (agentName.includes("Detection")) {
     const severity = output.severity || 'Medium';
@@ -585,7 +664,8 @@ function initMonitoringPage() {
     3: document.getElementById('step-3'),
     4: document.getElementById('step-4'),
     5: document.getElementById('step-5'),
-    6: document.getElementById('step-6')
+    6: document.getElementById('step-6'),
+    7: document.getElementById('step-7')
   };
 
   const logToConsole = (text, type = 'progress') => {
@@ -638,9 +718,9 @@ function initMonitoringPage() {
       logToConsole(`*** PIPELINE RUN FINISHED: ${eventData.message} Status: ${eventData.final_status} ***`, 'system');
       
       resetTimelineClasses();
-      if (timelineItems[6]) {
-        timelineItems[6].classList.add('done');
-        const outputBox = timelineItems[6].querySelector('.timeline-output');
+      if (timelineItems[7]) {
+        timelineItems[7].classList.add('done');
+        const outputBox = timelineItems[7].querySelector('.timeline-output');
         if (outputBox && !outputBox.innerHTML) {
           outputBox.innerHTML = `
             <div class="agent-output-card" style="text-align:center; padding: 0.5rem 0;">
@@ -757,17 +837,18 @@ function initMonitoringPage() {
 }
 
 function getStepNum(agentName) {
-  if (agentName.includes("Detection")) return 1;
-  if (agentName.includes("Risk")) return 2;
-  if (agentName.includes("Repair")) return 3;
-  if (agentName.includes("Government")) return 4;
-  if (agentName.includes("Civic")) return 5;
-  if (agentName.includes("Analytics")) return 6;
+  if (agentName.includes("Fraud")) return 1;
+  if (agentName.includes("Detection")) return 2;
+  if (agentName.includes("Risk")) return 3;
+  if (agentName.includes("Repair")) return 4;
+  if (agentName.includes("Government")) return 5;
+  if (agentName.includes("Civic")) return 6;
+  if (agentName.includes("Analytics")) return 7;
   return null;
 }
 
 function resetTimelineClasses() {
-  for (let i = 1; i <= 6; i++) {
+  for (let i = 1; i <= 7; i++) {
     const el = document.getElementById(`step-${i}`);
     if (el) el.classList.remove('active');
   }
@@ -801,6 +882,39 @@ async function initCitizenDashboard() {
         if (rData.points > 300) levelVal.innerText = "Veteran Builder";
         else if (rData.points > 100) levelVal.innerText = "City Guardian";
         else levelVal.innerText = "Active Citizen";
+      }
+
+      // Populate trust scores on citizen dashboard
+      const trustValEl = document.getElementById('citizen-trust-val');
+      const trustBadgeEl = document.getElementById('citizen-trust-badge');
+      const trustFillEl = document.getElementById('citizen-trust-fill');
+
+      if (trustValEl) trustValEl.innerText = rData.trust_score !== undefined ? rData.trust_score : 100;
+      if (trustBadgeEl) {
+        const score = rData.trust_score !== undefined ? rData.trust_score : 100;
+        const level = rData.trust_level || 'Trusted Citizen';
+        trustBadgeEl.innerText = level;
+        
+        trustBadgeEl.className = 'trust-badge-label';
+        let badgeClass = 'trust-badge-trusted';
+        let barClass = 'trusted';
+        
+        if (score < 50) {
+          badgeClass = 'trust-badge-restricted';
+          barClass = 'restricted';
+        } else if (score < 70) {
+          badgeClass = 'trust-badge-monitoring';
+          barClass = 'monitoring';
+        } else if (score < 90) {
+          badgeClass = 'trust-badge-verified';
+          barClass = 'verified';
+        }
+        
+        trustBadgeEl.classList.add(badgeClass);
+        if (trustFillEl) {
+          trustFillEl.className = `trust-gauge-bar-fill ${barClass}`;
+          trustFillEl.style.width = `${score}%`;
+        }
       }
 
       // Render recent badges on dashboard
@@ -1439,6 +1553,42 @@ async function initProfilePage() {
     const res = await fetch('/api/rewards');
     if (res.ok) {
       const data = await res.json();
+      
+      // Update points and profile trust details dynamically
+      document.getElementById('profile-points').innerText = data.points || 0;
+
+      const trustValEl = document.getElementById('profile-trust-val');
+      const trustBadgeEl = document.getElementById('profile-trust-badge');
+      const trustFillEl = document.getElementById('profile-trust-fill');
+
+      if (trustValEl) trustValEl.innerText = data.trust_score !== undefined ? data.trust_score : 100;
+      if (trustBadgeEl) {
+        const score = data.trust_score !== undefined ? data.trust_score : 100;
+        const level = data.trust_level || 'Trusted Citizen';
+        trustBadgeEl.innerText = level;
+        
+        trustBadgeEl.className = 'trust-badge-label';
+        let badgeClass = 'trust-badge-trusted';
+        let barClass = 'trusted';
+        
+        if (score < 50) {
+          badgeClass = 'trust-badge-restricted';
+          barClass = 'restricted';
+        } else if (score < 70) {
+          badgeClass = 'trust-badge-monitoring';
+          barClass = 'monitoring';
+        } else if (score < 90) {
+          badgeClass = 'trust-badge-verified';
+          barClass = 'verified';
+        }
+        
+        trustBadgeEl.classList.add(badgeClass);
+        if (trustFillEl) {
+          trustFillEl.className = `trust-gauge-bar-fill ${barClass}`;
+          trustFillEl.style.width = `${score}%`;
+        }
+      }
+
       const container = document.getElementById('profile-badges-container');
       if (container) {
         container.innerHTML = data.badges.map(b => `

@@ -23,12 +23,28 @@
       </div>
 
       <!-- Stat widget cards -->
-      <div class="stat-grid">
+      <div class="stat-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
         <div class="glass-panel stat-card">
           <div class="stat-icon">🪙</div>
           <div class="stat-info">
             <h3 id="citizen-points-val">0</h3>
             <p>Contribution Points</p>
+          </div>
+        </div>
+        
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">🛡️</div>
+          <div class="stat-info" style="width: 100%;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.25rem;">
+              <h3 id="citizen-trust-val" style="margin:0;">100</h3>
+              <span id="citizen-trust-badge" class="trust-badge-label trust-badge-trusted">Trusted</span>
+            </div>
+            <p style="margin: 0.25rem 0 0.5rem 0;">Civic Trust Score</p>
+            <div class="trust-gauge-container">
+              <div class="trust-gauge-bar-bg">
+                <div id="citizen-trust-fill" class="trust-gauge-bar-fill trusted" style="width: 100%;"></div>
+              </div>
+            </div>
           </div>
         </div>
         

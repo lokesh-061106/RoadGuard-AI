@@ -74,6 +74,8 @@ def get_current_user():
                 "password": "", # token recovery bypass
                 "role": role,
                 "points": 40,
+                "trust_score": 100,
+                "trust_level": "Trusted Citizen",
                 "badges": [],
                 "created_at": datetime.datetime.utcnow().isoformat() + "Z"
             }
@@ -117,6 +119,8 @@ def register():
         "password": generate_password_hash(data.password),
         "role": "citizen",
         "points": 40,  # 40 points registration welcome bonus!
+        "trust_score": 100,
+        "trust_level": "Trusted Citizen",
         "badges": [],
         "created_at": datetime.datetime.utcnow().isoformat() + "Z"
     }
@@ -215,7 +219,9 @@ def get_me():
                     "email": user.get("email"),
                     "role": user.get("role"),
                     "points": user.get("points", 0),
-                    "badges": user.get("badges", [])
+                    "badges": user.get("badges", []),
+                    "trust_score": user.get("trust_score", 100),
+                    "trust_level": user.get("trust_level", "Trusted Citizen")
                 }
             }), 200
             
@@ -245,13 +251,15 @@ def submit_report():
         latitude = float(request.form.get('latitude', 0.0))
         longitude = float(request.form.get('longitude', 0.0))
         description = request.form.get('description', '')
+        module = request.form.get('module', 'road')
         
         # Pydantic validation
         submission = IncidentSubmission(
             description=description,
             latitude=latitude,
             longitude=longitude,
-            image_name=file.filename
+            image_name=file.filename,
+            module=module
         )
     except (ValueError, TypeError) as e:
         return jsonify({"status": "error", "message": "Invalid latitude/longitude inputs"}), 400
@@ -278,7 +286,8 @@ def submit_report():
             description=submission.description,
             latitude=submission.latitude,
             longitude=submission.longitude,
-            image_name=unique_filename
+            image_name=unique_filename,
+            module=submission.module
         ):
             lines = event.strip().split('\n')
             if len(lines) >= 2:
@@ -435,15 +444,18 @@ def sync_incidents():
 @app.route('/api/incidents', methods=['GET'])
 def get_incidents():
     incidents = db.read('incidents', default=[])
-    # Optionally filter by status or user
+    # Optionally filter by status, user, or module
     user_id = request.args.get('user_id')
     status = request.args.get('status')
+    module = request.args.get('module')
     
     filtered = incidents
     if user_id:
         filtered = [i for i in filtered if i.get("reporter_id") == user_id]
     if status:
         filtered = [i for i in filtered if i.get("status") == status]
+    if module:
+        filtered = [i for i in filtered if i.get("module") == module]
         
     # Sort by creation date reverse
     filtered.sort(key=lambda x: x.get("created_at", ""), reverse=True)
@@ -532,7 +544,9 @@ def redeem_reward():
         "rwd_rail": {"points": 100, "name": "50% Railway Ticket Discount Coupon"},
         "rwd_museum": {"points": 40, "name": "Free Entry Pass - National Museum"},
         "rwd_zoo": {"points": 50, "name": "Tourism Zoo Park Single Entry Ticket"},
-        "rwd_metro": {"points": 80, "name": "$10 Public Metro Transportation Credit"}
+        "rwd_metro": {"points": 80, "name": "$10 Public Metro Transportation Credit"},
+        "rwd_water": {"points": 60, "name": "Eco Water Purifier Cartridge Voucher"},
+        "rwd_plant": {"points": 40, "name": "Eco-Adopt: Plant a Tree Certificate"}
     }
 
     reward_item = catalog.get(data.reward_id)

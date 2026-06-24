@@ -15,6 +15,7 @@ class IncidentSubmission(BaseModel):
     latitude: float = Field(..., ge=-90.0, le=90.0, description="Latitude coordinate")
     longitude: float = Field(..., ge=-180.0, le=180.0, description="Longitude coordinate")
     image_name: str = Field(..., description="Uploaded image file name")
+    module: str = Field("road", description="The CivicGuard module (road, water, environment, cleancity, asset)")
 
 class RewardRedeem(BaseModel):
     reward_id: str = Field(..., description="The ID of the reward to redeem")

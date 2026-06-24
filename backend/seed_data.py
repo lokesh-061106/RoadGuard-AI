@@ -21,6 +21,8 @@ def seed_all(force: bool = False):
             "password": "pbkdf2:sha256:260000$defaultpbkdf2hashvaluecitizen1",  # Simple mock hash (we'll support password verification)
             "role": "citizen",
             "points": 185,
+            "trust_score": 100,
+            "trust_level": "Trusted Citizen",
             "badges": ["Road Protector", "Community Guardian"],
             "created_at": "2026-06-15T09:00:00Z"
         },
@@ -31,6 +33,8 @@ def seed_all(force: bool = False):
             "password": "pbkdf2:sha256:260000$defaultpbkdf2hashvaluecitizen2",
             "role": "citizen",
             "points": 75,
+            "trust_score": 92,
+            "trust_level": "Trusted Citizen",
             "badges": ["Road Protector"],
             "created_at": "2026-06-18T14:30:00Z"
         },
@@ -41,6 +45,8 @@ def seed_all(force: bool = False):
             "password": "pbkdf2:sha256:260000$defaultpbkdf2hashvalueauthority",
             "role": "authority",
             "points": 0,
+            "trust_score": 100,
+            "trust_level": "Trusted Citizen",
             "badges": [],
             "created_at": "2026-06-10T08:00:00Z"
         },
@@ -51,6 +57,8 @@ def seed_all(force: bool = False):
             "password": "pbkdf2:sha256:260000$defaultpbkdf2hashvalueadmin",
             "role": "admin",
             "points": 0,
+            "trust_score": 100,
+            "trust_level": "Trusted Citizen",
             "badges": [],
             "created_at": "2026-06-01T10:00:00Z"
         }
