@@ -363,6 +363,23 @@ Status: Production Core Summary
 """
     return report
 
+# Tool 10: generate_city_report
+@mcp.tool()
+def generate_city_report() -> str:
+    """
+    Generates a smart governance monthly executive briefing outlining safety performance,
+    re-solved issues count, expenditure summaries, and hotspot clusters.
+    """
+    return generate_monthly_report()
+
+# Tool 11: get_user_contribution_history
+@mcp.tool()
+def get_user_contribution_history(user_id: str) -> dict:
+    """
+    Retrieve user contribution history and rewards status.
+    """
+    return get_user_rewards(user_id)
+
 def update_leaderboard_cache():
     """Helper function to update leaderboard rankings based on user points."""
     users = db.read('users', default=[])
