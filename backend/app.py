@@ -40,7 +40,10 @@ seed_data.seed_all()
 
 # Helper: Get current user ID
 def get_current_user():
-    return session.get('user_id')
+    user_id = session.get('user_id')
+    if not user_id:
+        user_id = request.headers.get('X-User-Id')
+    return user_id
 
 # Helper: Check if user is authority/admin
 def require_role(roles):

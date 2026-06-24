@@ -1,5 +1,25 @@
 // RoadGuard AI - Global Frontend Operations
 
+// Override fetch to automatically attach X-User-Id header if user is logged in
+const originalFetch = window.fetch;
+window.fetch = function(url, options) {
+  options = options || {};
+  options.headers = options.headers || {};
+  
+  const localUserStr = localStorage.getItem('user');
+  if (localUserStr) {
+    try {
+      const user = JSON.parse(localUserStr);
+      if (options.headers instanceof Headers) {
+        options.headers.set('X-User-Id', user.id);
+      } else {
+        options.headers['X-User-Id'] = user.id;
+      }
+    } catch (e) {}
+  }
+  return originalFetch(url, options);
+};
+
 // State Management
 const State = {
   user: null,
@@ -20,11 +40,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 // =====================================================================
 
 async function checkAuthStatus() {
+  const localUserStr = localStorage.getItem('user');
+  if (localUserStr) {
+    try {
+      State.user = JSON.parse(localUserStr);
+      updateNavbar(true);
+      return;
+    } catch (err) {
+      localStorage.removeItem('user');
+    }
+  }
+
   try {
     const res = await fetch('/api/auth/me');
     if (res.ok) {
       const data = await res.json();
       State.user = data.user;
+      localStorage.setItem('user', JSON.stringify(data.user));
       updateNavbar(true);
     } else {
       State.user = null;
@@ -100,13 +132,13 @@ function updateNavbar(isLoggedIn) {
 
 async function handleLogout() {
   try {
-    const res = await fetch('/api/auth/logout', { method: 'POST' });
-    if (res.ok) {
-      alert("Successfully logged out.");
-      window.location.href = '/';
-    }
+    localStorage.removeItem('user');
+    await fetch('/api/auth/logout', { method: 'POST' });
+    alert("Successfully logged out.");
+    window.location.href = '/';
   } catch (err) {
-    alert("Logout failed: " + err);
+    localStorage.removeItem('user');
+    window.location.href = '/';
   }
 }
 
@@ -166,6 +198,7 @@ function initLoginPage() {
       });
       const data = await res.json();
       if (res.ok) {
+        localStorage.setItem('user', JSON.stringify(data.user));
         window.location.href = data.user.role === 'citizen' ? '/citizen.html' : '/authority.html';
       } else {
         alert("Login failed: " + data.message);
@@ -193,6 +226,7 @@ function initRegisterPage() {
       });
       const data = await res.json();
       if (res.ok) {
+        localStorage.setItem('user', JSON.stringify(data.user));
         alert("Account created successfully!");
         window.location.href = '/citizen.html';
       } else {
