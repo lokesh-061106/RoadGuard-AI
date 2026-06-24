@@ -32,6 +32,9 @@ const State = {
 // Initialization on DOM Content Loaded
 document.addEventListener('DOMContentLoaded', async () => {
   await checkAuthStatus();
+  if (State.user) {
+    syncLocalIncidentsWithServer();
+  }
   routePageLogic();
 });
 
@@ -66,6 +69,24 @@ async function checkAuthStatus() {
     console.error("Auth check failed:", err);
     State.user = null;
     updateNavbar(false);
+  }
+}
+
+async function syncLocalIncidentsWithServer() {
+  const localIncidents = JSON.parse(localStorage.getItem('local_incidents') || '[]');
+  if (localIncidents.length === 0) return;
+  
+  try {
+    const res = await fetch('/api/sync-incidents', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ incidents: localIncidents })
+    });
+    if (res.ok) {
+      console.log("Local incidents synced successfully with transient server DB.");
+    }
+  } catch (err) {
+    console.error("Failed to sync local incidents with server:", err);
   }
 }
 
@@ -326,6 +347,16 @@ function initReportPage() {
       if (res.ok) {
         if (data.events) {
           sessionStorage.setItem(`telemetry_${data.incident_id}`, JSON.stringify(data.events));
+        }
+        if (data.incident) {
+          try {
+            let localIncidents = JSON.parse(localStorage.getItem('local_incidents') || '[]');
+            localIncidents = localIncidents.filter(i => i.id !== data.incident.id);
+            localIncidents.push(data.incident);
+            localStorage.setItem('local_incidents', JSON.stringify(localIncidents));
+          } catch (e) {
+            console.error("Failed to save incident to localStorage:", e);
+          }
         }
         window.location.href = data.redirect_url;
       } else {
@@ -756,24 +787,46 @@ async function initCitizenDashboard() {
     // Load reports
     const resInc = await fetch(`/api/incidents?user_id=${State.user.id}`);
     if (resInc.ok) {
-      const incidents = await resInc.json();
+      let incidents = await resInc.json();
+      
+      // Merge with local incidents to combat Vercel container recycling
+      try {
+        const localIncidents = JSON.parse(localStorage.getItem('local_incidents') || '[]')
+          .filter(i => i.reporter_id === State.user.id);
+          
+        const existingIds = new Set(incidents.map(i => i.id));
+        localIncidents.forEach(li => {
+          if (!existingIds.has(li.id)) {
+            incidents.push(li);
+          }
+        });
+        
+        incidents.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      } catch (err) {
+        console.error("Error merging local incidents:", err);
+      }
+
       const listContainer = document.getElementById('citizen-reports-list');
       if (listContainer) {
-        listContainer.innerHTML = incidents.map(inc => `
-          <div class="glass-panel report-item">
-            <div>
-              <h4 style="font-weight:700;">#${inc.id.split('_')[1]} - ${inc.detection?.damage_type || 'Infrastructure Hazard'}</h4>
-              <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.25rem;">
-                📍 Coordinate: ${inc.latitude.toFixed(4)}, ${inc.longitude.toFixed(4)} | Reported: ${new Date(inc.created_at).toLocaleDateString()}
-              </p>
+        listContainer.innerHTML = incidents.map(inc => {
+          const incId = inc.id || 'inc_0000';
+          const cleanId = incId.includes('_') ? incId.split('_')[1] : incId;
+          return `
+            <div class="glass-panel report-item">
+              <div>
+                <h4 style="font-weight:700;">#${cleanId} - ${inc.detection?.damage_type || 'Infrastructure Hazard'}</h4>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.25rem;">
+                  📍 Coordinate: ${inc.latitude.toFixed(4)}, ${inc.longitude.toFixed(4)} | Reported: ${new Date(inc.created_at).toLocaleDateString()}
+                </p>
+              </div>
+              <div style="display:flex; align-items:center; gap:1rem;">
+                <span class="badge badge-${getSeverityClass(inc.risk?.priority || 'Low')}">${inc.risk?.priority || 'Pending'}</span>
+                <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">${inc.status.toUpperCase()}</span>
+                <a href="/tracker.html?id=${inc.id}" class="btn btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.8rem;">Track</a>
+              </div>
             </div>
-            <div style="display:flex; align-items:center; gap:1rem;">
-              <span class="badge badge-${getSeverityClass(inc.risk?.priority || 'Low')}">${inc.risk?.priority || 'Pending'}</span>
-              <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">${inc.status.toUpperCase()}</span>
-              <a href="/tracker.html?id=${inc.id}" class="btn btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.8rem;">Track</a>
-            </div>
-          </div>
-        `).join('') || `<p style="color:var(--text-muted); font-size:0.95rem;">You haven't reported any infrastructure issues yet.</p>`;
+          `;
+        }).join('') || `<p style="color:var(--text-muted); font-size:0.95rem;">You haven't reported any infrastructure issues yet.</p>`;
       }
     }
   } catch (err) {
@@ -1139,6 +1192,18 @@ function initTrackerPage() {
         const inc = await res.json();
         renderTrackerResult(inc);
       } else {
+        // Fallback to localStorage cache
+        try {
+          const localIncidents = JSON.parse(localStorage.getItem('local_incidents') || '[]');
+          const found = localIncidents.find(i => i.id === incidentId);
+          if (found) {
+            renderTrackerResult(found);
+            return;
+          }
+        } catch (e) {
+          console.error("Local incident search failed:", e);
+        }
+        
         document.getElementById('tracker-result-container').innerHTML = `
           <div class="glass-panel" style="text-align:center; padding:3rem;">
             <h3 style="color:var(--neon-red)">Incident Not Found</h3>

@@ -295,10 +295,22 @@ def submit_report():
     except Exception as e:
         return jsonify({"status": "error", "message": f"Pipeline execution failed: {str(e)}"}), 500
 
+    # Retrieve the final saved incident from the DB manager
+    final_incident = None
+    try:
+        incidents = db.read('incidents', default=[])
+        for inc in incidents:
+            if inc.get("id") == incident_id:
+                final_incident = inc
+                break
+    except Exception:
+        pass
+
     return jsonify({
         "status": "success",
         "message": "Incident submission registered and analyzed successfully.",
         "incident_id": incident_id,
+        "incident": final_incident,
         "events": events,
         "redirect_url": f"/monitoring.html?id={incident_id}"
     }), 201
@@ -390,6 +402,35 @@ def run_incident_pipeline_sync(id):
 # =====================================================================
 # GENERAL DATABASE API ENDPOINTS
 # =====================================================================
+
+@app.route('/api/sync-incidents', methods=['POST'])
+def sync_incidents():
+    try:
+        data = request.get_json() or {}
+        client_incidents = data.get("incidents", [])
+    except Exception:
+        return jsonify({"status": "error", "message": "Invalid JSON data"}), 400
+
+    if not client_incidents:
+        return jsonify({"status": "success", "synced_count": 0})
+
+    incidents = db.read('incidents', default=[])
+    existing_ids = {inc.get("id") for inc in incidents}
+    
+    synced_count = 0
+    for client_inc in client_incidents:
+        if client_inc.get("id") not in existing_ids:
+            if "created_at" not in client_inc:
+                client_inc["created_at"] = datetime.datetime.utcnow().isoformat() + "Z"
+            if "updated_at" not in client_inc:
+                client_inc["updated_at"] = datetime.datetime.utcnow().isoformat() + "Z"
+            incidents.append(client_inc)
+            synced_count += 1
+            
+    if synced_count > 0:
+        db.write('incidents', incidents)
+        
+    return jsonify({"status": "success", "synced_count": synced_count}), 200
 
 @app.route('/api/incidents', methods=['GET'])
 def get_incidents():
