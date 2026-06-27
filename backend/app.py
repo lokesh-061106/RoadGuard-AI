@@ -114,19 +114,60 @@ def test_paths():
 def serve_index():
     return send_from_directory(app.static_folder, 'index.html')
 
+@app.route('/login')
+def serve_login():
+    return send_from_directory(app.static_folder, 'login.html')
+
+@app.route('/register')
+def serve_register():
+    return send_from_directory(app.static_folder, 'register.html')
+
+@app.route('/citizen')
+def serve_citizen():
+    return send_from_directory(app.static_folder, 'citizen.html')
+
+@app.route('/authority')
+def serve_authority():
+    return send_from_directory(app.static_folder, 'authority.html')
+
+@app.route('/admin')
+def serve_admin():
+    return send_from_directory(app.static_folder, 'admin.html')
+
+@app.route('/analytics')
+def serve_analytics():
+    return send_from_directory(app.static_folder, 'analytics.html')
+
+@app.route('/monitoring')
+def serve_monitoring():
+    return send_from_directory(app.static_folder, 'monitoring.html')
+
+@app.route('/profile')
+def serve_profile():
+    return send_from_directory(app.static_folder, 'profile.html')
+
+@app.route('/report')
+def serve_report():
+    return send_from_directory(app.static_folder, 'report.html')
+
+@app.route('/rewards')
+def serve_rewards():
+    return send_from_directory(app.static_folder, 'rewards.html')
+
+@app.route('/tracker')
+def serve_tracker():
+    return send_from_directory(app.static_folder, 'tracker.html')
+
+@app.route('/leaderboard')
+def serve_leaderboard():
+    return send_from_directory(app.static_folder, 'leaderboard.html')
+
 @app.route('/<path:path>')
 def serve_static(path):
     if path.startswith('api/'):
         return jsonify({"status": "error", "message": "API route not found"}), 404
-        
     if os.path.exists(os.path.join(app.static_folder, path)):
         return send_from_directory(app.static_folder, path)
-        
-    if not path.endswith('.html'):
-        html_path = path + '.html'
-        if os.path.exists(os.path.join(app.static_folder, html_path)):
-            return send_from_directory(app.static_folder, html_path)
-            
     return send_from_directory(app.static_folder, 'index.html')
 
 # =====================================================================
