@@ -96,6 +96,29 @@ def require_role(roles):
     return None
 
 # =====================================================================
+# STATIC FILES & PAGE ROUTING
+# =====================================================================
+
+@app.route('/')
+def serve_index():
+    return send_from_directory(app.static_folder, 'index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    if path.startswith('api/'):
+        return jsonify({"status": "error", "message": "API route not found"}), 404
+        
+    if os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+        
+    if not path.endswith('.html'):
+        html_path = path + '.html'
+        if os.path.exists(os.path.join(app.static_folder, html_path)):
+            return send_from_directory(app.static_folder, html_path)
+            
+    return send_from_directory(app.static_folder, 'index.html')
+
+# =====================================================================
 # AUTHENTICATION API
 # =====================================================================
 
