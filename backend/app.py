@@ -99,6 +99,17 @@ def require_role(roles):
 # STATIC FILES & PAGE ROUTING
 # =====================================================================
 
+@app.route('/api/test-paths')
+def test_paths():
+    import os
+    return jsonify({
+        "static_folder": app.static_folder,
+        "abspath": os.path.abspath(app.static_folder),
+        "exists": os.path.exists(app.static_folder),
+        "files": os.listdir(app.static_folder) if os.path.exists(app.static_folder) else [],
+        "root_files": os.listdir('.')
+    })
+
 @app.route('/')
 def serve_index():
     return send_from_directory(app.static_folder, 'index.html')
