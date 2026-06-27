@@ -349,8 +349,8 @@ function initRegisterPage() {
           localStorage.setItem('local_users', JSON.stringify(localUsers));
         }
         
-        alert("Account created successfully!");
-        window.location.href = '/citizen.html';
+        alert("Account created successfully! Please log in.");
+        window.location.href = '/login.html';
       } else {
         alert("Registration failed: " + data.message);
       }
