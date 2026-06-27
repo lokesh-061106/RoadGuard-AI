@@ -5,22 +5,6 @@
     {
       "src": "api/index.py",
       "use": "@vercel/python"
-    },
-    {
-      "src": "frontend/*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "frontend/css/**/*",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "frontend/js/**/*",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "frontend/static/**/*",
-      "use": "@vercel/static"
     }
   ],
   "routes": [
