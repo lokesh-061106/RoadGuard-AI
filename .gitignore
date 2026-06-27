@@ -14,3 +14,6 @@ Thumbs.db
 
 # Uploads and temporary assets
 backend/frontend/static/uploads/report_*
+
+.vercel
+.env*
