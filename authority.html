@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authority Dashboard - RoadGuard AI</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="/" class="nav-brand">🛡️ RoadGuard <span>AI</span></a>
+        <ul class="nav-menu" id="nav-menu-links"></ul>
+        <div class="nav-auth" id="nav-auth-container"></div>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1 class="page-title">Municipal Maintenance Hub</h1>
+        <p class="page-subtitle">Government Authority Operations: Review AI-assisted repair plans, dispatch crews, and track work orders.</p>
+      </div>
+
+      <!-- Filters tab bar -->
+      <div style="display:flex; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap; border-bottom:1px solid var(--border-glass); padding-bottom:1rem;">
+        <button class="btn btn-secondary filter-tab active" data-filter="all">All Incidents</button>
+        <button class="btn btn-secondary filter-tab" data-filter="reported">Pending Review</button>
+        <button class="btn btn-secondary filter-tab" data-filter="dispatched">Dispatched Crews</button>
+        <button class="btn btn-secondary filter-tab" data-filter="resolved">Resolved Issues</button>
+        <button class="btn btn-secondary filter-tab" data-filter="duplicate">Duplicate Archives</button>
+      </div>
+
+      <!-- Incidents Registry -->
+      <div class="glass-panel" style="padding:0; overflow-x:auto;">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Damage Type</th>
+              <th>Risk Level</th>
+              <th>Dispatch Agency</th>
+              <th>Status</th>
+              <th>Task Action</th>
+            </tr>
+          </thead>
+          <tbody id="authority-incidents-tbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js?v=6"></script>
+</body>
+</html>

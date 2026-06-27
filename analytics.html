@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Governance Analytics - RoadGuard AI</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+</head>
+<body>
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="/" class="nav-brand">🛡️ RoadGuard <span>AI</span></a>
+        <ul class="nav-menu" id="nav-menu-links"></ul>
+        <div class="nav-auth" id="nav-auth-container"></div>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1 class="page-title">Smart Governance Analytics</h1>
+        <p class="page-subtitle">Metropolitan infrastructure indexes, budget allocations, and active safety heatmaps.</p>
+      </div>
+
+      <!-- Quick stats grids -->
+      <div class="stat-grid" style="margin-bottom:2rem;">
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">📈</div>
+          <div class="stat-info">
+            <h3 id="anal-total">0</h3>
+            <p>Total Reported</p>
+          </div>
+        </div>
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">✓</div>
+          <div class="stat-info">
+            <h3 id="anal-resolved">0</h3>
+            <p>Resolved Cases</p>
+          </div>
+        </div>
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-info">
+            <h3 id="anal-active">0</h3>
+            <p>Active Work Orders</p>
+          </div>
+        </div>
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">⚡</div>
+          <div class="stat-info">
+            <h3 id="anal-risk">0</h3>
+            <p>Average Danger Index</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hotspot map -->
+      <div class="glass-panel" style="margin-bottom:2rem; padding:1.25rem;">
+        <h3 style="font-weight:700; font-size:1.25rem; margin-bottom:0.75rem;">Metropolitan Incident Hotspots</h3>
+        <div id="analytics-map" class="map-container" style="height: 400px; width: 100%;"></div>
+      </div>
+
+      <!-- Chart grid -->
+      <div class="grid-3" style="margin-bottom:3rem;">
+        <div class="glass-panel">
+          <h3 style="font-weight:700; font-size:1.1rem; margin-bottom:1rem; text-align:center;">Severity Distribution</h3>
+          <canvas id="chart-severity" style="max-height:220px;"></canvas>
+        </div>
+        <div class="glass-panel">
+          <h3 style="font-weight:700; font-size:1.1rem; margin-bottom:1rem; text-align:center;">Categories Registry</h3>
+          <canvas id="chart-category" style="max-height:220px;"></canvas>
+        </div>
+        <div class="glass-panel">
+          <h3 style="font-weight:700; font-size:1.1rem; margin-bottom:1rem; text-align:center;">Monthly Danger Index Trend</h3>
+          <canvas id="chart-trend" style="max-height:220px;"></canvas>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ChartJS and LeafletJS scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="/js/main.js?v=6"></script>
+</body>
+</html>

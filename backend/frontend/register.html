@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - RoadGuard AI</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="/" class="nav-brand">🛡️ RoadGuard <span>AI</span></a>
+        <ul class="nav-menu" id="nav-menu-links"></ul>
+        <div class="nav-auth" id="nav-auth-container"></div>
+      </div>
+    </nav>
+
+    <main class="main-content" style="display:flex; align-items:center; justify-content:center; min-height:80vh;">
+      <div class="glass-panel" style="width:100%; max-width:420px; padding:2.5rem;">
+        <h2 style="font-weight:800; font-size:1.8rem; text-align:center; margin-bottom:0.5rem; color:#fff;">Join RoadGuard</h2>
+        <p style="color:var(--text-muted); font-size:0.9rem; text-align:center; margin-bottom:2rem;">Start contributing to civic infrastructure and earn rewards</p>
+        
+        <form id="register-form">
+          <div class="form-group">
+            <label class="form-label" for="reg-name">Full Name</label>
+            <input type="text" id="reg-name" class="form-input" required placeholder="Arjun Kumar">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Email Address</label>
+            <input type="email" id="reg-email" class="form-input" required placeholder="name@domain.com">
+          </div>
+          <div class="form-group" style="margin-bottom:2rem;">
+            <label class="form-label" for="reg-password">Password</label>
+            <input type="password" id="reg-password" class="form-input" required placeholder="Minimum 6 characters">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;">Create Account</button>
+        </form>
+
+        <p style="color:var(--text-muted); font-size:0.88rem; text-align:center; margin-top:1.5rem;">
+          Already have an account? <a href="/login.html" style="color:var(--secondary-glow); text-decoration:none;">Log In</a>
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js?v=6"></script>
+</body>
+</html>

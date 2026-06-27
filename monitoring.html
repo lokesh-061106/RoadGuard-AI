@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Agent Workflow Monitor - RoadGuard AI</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="/" class="nav-brand">🛡️ RoadGuard <span>AI</span></a>
+        <ul class="nav-menu" id="nav-menu-links"></ul>
+        <div class="nav-auth" id="nav-auth-container"></div>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1 class="page-title">Agentic Workflow Live Monitor</h1>
+        <p class="page-subtitle">Watch the multi-agent orchestration execute, evaluate risk context, register issues, and award points.</p>
+      </div>
+
+      <div class="dashboard-grid" style="grid-template-columns: 1.1fr 1.3fr;">
+        <!-- Left Column: Graphical agent pipeline timeline steps -->
+        <div class="glass-panel">
+          <h3 style="font-weight:700; font-size:1.3rem; margin-bottom:1.5rem; border-bottom:1px solid var(--border-glass); padding-bottom:0.75rem;">
+            Pipeline Lifecycle Nodes
+          </h3>
+          
+          <div class="timeline">
+            <!-- Step 1 -->
+            <div class="timeline-item" id="step-1">
+              <div class="timeline-node"></div>
+              <div class="timeline-title">1. FraudGuard AI Agent</div>
+              <div class="timeline-desc">Verifies report authenticity, checks AI generation, geo-fences coordinates, and monitors citizen trust metrics.</div>
+              <div class="timeline-output"></div>
+            </div>
+            
+            <!-- Step 2 -->
+            <div class="timeline-item" id="step-2">
+              <div class="timeline-node"></div>
+              <div class="timeline-title">2. Infrastructure Detection Agent</div>
+              <div class="timeline-desc">Analyzes the damage context, category, and severity from report data.</div>
+              <div class="timeline-output"></div>
+            </div>
+            
+            <!-- Step 3 -->
+            <div class="timeline-item" id="step-3">
+              <div class="timeline-node"></div>
+              <div class="timeline-title">3. Risk Assessment Agent</div>
+              <div class="timeline-desc">Resolves traffic and zone conditions via MCP, calculating risk index.</div>
+              <div class="timeline-output"></div>
+            </div>
+            
+            <!-- Step 4 -->
+            <div class="timeline-item" id="step-4">
+              <div class="timeline-node"></div>
+              <div class="timeline-title">4. Repair Recommendation Agent</div>
+              <div class="timeline-desc">Generates civil engineering blueprints, BOMs, and budget forecasts.</div>
+              <div class="timeline-output"></div>
+            </div>
+            
+            <!-- Step 5 -->
+            <div class="timeline-item" id="step-5">
+              <div class="timeline-node"></div>
+              <div class="timeline-title">5. Government Assistance Agent</div>
+              <div class="timeline-desc">Saves reports via MCP, generating municipal work orders and crew assignments.</div>
+              <div class="timeline-output"></div>
+            </div>
+            
+            <!-- Step 6 -->
+            <div class="timeline-item" id="step-6">
+              <div class="timeline-node"></div>
+              <div class="timeline-title">6. Civic Rewards Agent</div>
+              <div class="timeline-desc">Validates duplicate checks and awards contribution points to citizen.</div>
+              <div class="timeline-output"></div>
+            </div>
+            
+            <!-- Step 7 -->
+            <div class="timeline-item" id="step-7">
+              <div class="timeline-node"></div>
+              <div class="timeline-title">7. Smart Governance Analytics</div>
+              <div class="timeline-desc">Rebuilds metropolitan hotspots and updates governance dashboards.</div>
+              <div class="timeline-output"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Live typewriter terminal console logs -->
+        <div style="display:flex; flex-direction:column; gap:1.5rem;">
+          <div class="glass-panel" style="flex:1; display:flex; flex-direction:column;">
+            <h3 style="font-weight:700; font-size:1.3rem; margin-bottom:1rem;">Agent Telemetry Console</h3>
+            <div class="console-container" id="console-log" style="flex:1; min-height:400px;">
+              <!-- Live logs will append here -->
+            </div>
+          </div>
+
+          <!-- Done Controls -->
+          <div class="glass-panel" id="complete-controls" style="display:none; animation: fadeIn 0.5s ease-in-out;">
+            <h3 style="font-weight:700; font-size:1.2rem; color:var(--neon-teal); margin-bottom:0.5rem;">Orchestration Completed</h3>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
+              The incident has been processed, cataloged into public registries, and your rewards point balance has been updated.
+            </p>
+            <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+              <a href="/citizen.html" class="btn btn-primary">Go to Dashboard</a>
+              <a href="/rewards.html" class="btn btn-secondary">Claim Rewards</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js?v=6"></script>
+</body>
+</html>

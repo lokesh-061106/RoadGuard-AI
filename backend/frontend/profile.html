@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Profile - RoadGuard AI</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="/" class="nav-brand">🛡️ RoadGuard <span>AI</span></a>
+        <ul class="nav-menu" id="nav-menu-links"></ul>
+        <div class="nav-auth" id="nav-auth-container"></div>
+      </div>
+    </nav>
+
+    <main class="main-content" style="display:flex; align-items:center; justify-content:center; min-height:80vh;">
+      <div class="glass-panel" style="width:100%; max-width:600px; padding:2.5rem;">
+        <h2 style="font-weight:800; font-size:2rem; margin-bottom:1.5rem; text-align:center; border-bottom:1px solid var(--border-glass); padding-bottom:1rem;">
+          Citizen Profile
+        </h2>
+
+        <!-- Details grid -->
+        <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:2rem; align-items:center;">
+          <!-- Profile Avatar/Points -->
+          <div style="text-align:center; border-right:1px solid var(--border-glass); padding-right:2rem;">
+            <div style="font-size:4rem; margin-bottom:0.5rem;">👤</div>
+            <h3 id="profile-name" style="font-weight:800; font-size:1.3rem;">Arjun Kumar</h3>
+            <p id="profile-role" style="font-size:0.75rem; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-top:0.25rem;">CITIZEN</p>
+          </div>
+
+          <!-- Attributes readouts -->
+          <div>
+            <div class="form-group">
+              <label class="form-label" style="color:var(--text-muted);">Registered Email</label>
+              <p id="profile-email" style="font-size:1.1rem; font-weight:500;">arjun@roadguard.ai</p>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label class="form-label" style="color:var(--text-muted);">Total Point Balance</label>
+              <p style="font-size:1.5rem; font-weight:800; color:var(--neon-amber);"><span id="profile-points">0</span> Points</p>
+            </div>
+
+            <div class="form-group" style="margin-bottom:0; width: 100%;">
+              <label class="form-label" style="color:var(--text-muted);">Civic Trust Status</label>
+              <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.25rem;">
+                <span style="font-size:1.5rem; font-weight:800; color:var(--neon-teal);" id="profile-trust-val">100</span>
+                <span id="profile-trust-badge" class="trust-badge-label trust-badge-trusted" style="font-size: 0.75rem;">Trusted Citizen</span>
+              </div>
+              <div class="trust-gauge-container" style="margin-top:0.5rem; max-width: 250px;">
+                <div class="trust-gauge-bar-bg">
+                  <div id="profile-trust-fill" class="trust-gauge-bar-fill trusted" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Badges section -->
+        <div style="margin-top:2.5rem; border-top:1px solid var(--border-glass); padding-top:1.5rem;">
+          <h3 style="font-weight:700; font-size:1.2rem; margin-bottom:1rem;">Your Civic Badges</h3>
+          <div class="badges-container" id="profile-badges-container" style="justify-content:center;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js?v=6"></script>
+</body>
+</html>
