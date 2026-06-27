@@ -227,7 +227,7 @@ async function handleLogout() {
 // =====================================================================
 
 function routePageLogic() {
-  const path = window.location.pathname.toLowerCase().replace('.html', '');
+  const path = window.location.pathname.toLowerCase().replace('.html', '').replace(/\/$/, '');
   
   if (path === '/login') {
     initLoginPage();
@@ -292,6 +292,11 @@ function initLoginPage() {
   if (!form) return;
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerText;
+    submitBtn.innerText = "Logging in...";
+    submitBtn.disabled = true;
+
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
     
@@ -331,9 +336,13 @@ function initLoginPage() {
         window.location.href = data.user.role === 'citizen' ? '/citizen.html' : '/authority.html';
       } else {
         showAuthMessage(form, "Login failed: " + data.message, false);
+        submitBtn.innerText = originalText;
+        submitBtn.disabled = false;
       }
     } catch (err) {
       showAuthMessage(form, "Error: " + err, false);
+      submitBtn.innerText = originalText;
+      submitBtn.disabled = false;
     }
   });
 }
@@ -343,6 +352,11 @@ function initRegisterPage() {
   if (!form) return;
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerText;
+    submitBtn.innerText = "Creating Account...";
+    submitBtn.disabled = true;
+
     const name = document.getElementById('reg-name').value;
     const email = document.getElementById('reg-email').value;
     const password = document.getElementById('reg-password').value;
@@ -380,6 +394,8 @@ function initRegisterPage() {
           window.location.href = '/login.html';
         }, 1500);
       } else {
+        submitBtn.innerText = originalText;
+        submitBtn.disabled = false;
         if (data.message && data.message.toLowerCase().includes("already registered")) {
           showAuthMessage(form, "This email is already registered! Redirecting to login...", true);
           setTimeout(() => {
@@ -390,10 +406,12 @@ function initRegisterPage() {
         }
       }
     } catch (err) {
-      alert("Error: " + err);
+      showAuthMessage(form, "Error: " + err, false);
+      submitBtn.innerText = originalText;
+      submitBtn.disabled = false;
     }
   });
-};
+}
 
 
 // =====================================================================
