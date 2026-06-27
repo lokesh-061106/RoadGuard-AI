@@ -261,6 +261,32 @@ function routePageLogic() {
 // 1. LOGIN & REGISTER
 // =====================================================================
 
+function showAuthMessage(form, message, isSuccess) {
+  let msgEl = document.getElementById('auth-message');
+  if (!msgEl) {
+    msgEl = document.createElement('div');
+    msgEl.id = 'auth-message';
+    msgEl.style.padding = '0.75rem';
+    msgEl.style.marginBottom = '1.25rem';
+    msgEl.style.borderRadius = '6px';
+    msgEl.style.fontSize = '0.9rem';
+    msgEl.style.textAlign = 'center';
+    msgEl.style.fontWeight = '600';
+    msgEl.style.transition = 'all 0.3s ease';
+    form.insertBefore(msgEl, form.firstChild);
+  }
+  msgEl.innerText = message;
+  if (isSuccess) {
+    msgEl.style.background = 'rgba(46, 213, 115, 0.15)';
+    msgEl.style.color = '#2ed573';
+    msgEl.style.border = '1px solid rgba(46, 213, 115, 0.3)';
+  } else {
+    msgEl.style.background = 'rgba(255, 71, 87, 0.15)';
+    msgEl.style.color = '#ff4757';
+    msgEl.style.border = '1px solid rgba(255, 71, 87, 0.3)';
+  }
+}
+
 function initLoginPage() {
   const form = document.getElementById('login-form');
   if (!form) return;
@@ -304,10 +330,10 @@ function initLoginPage() {
         
         window.location.href = data.user.role === 'citizen' ? '/citizen.html' : '/authority.html';
       } else {
-        alert("Login failed: " + data.message);
+        showAuthMessage(form, "Login failed: " + data.message, false);
       }
     } catch (err) {
-      alert("Error: " + err);
+      showAuthMessage(form, "Error: " + err, false);
     }
   });
 }
@@ -349,14 +375,18 @@ function initRegisterPage() {
           localStorage.setItem('local_users', JSON.stringify(localUsers));
         }
         
-        alert("Account created successfully! Please log in.");
-        window.location.href = '/login.html';
+        showAuthMessage(form, "Account created successfully! Redirecting to login...", true);
+        setTimeout(() => {
+          window.location.href = '/login.html';
+        }, 1500);
       } else {
         if (data.message && data.message.toLowerCase().includes("already registered")) {
-          alert("This email is already registered! Redirecting to login...");
-          window.location.href = '/login.html';
+          showAuthMessage(form, "This email is already registered! Redirecting to login...", true);
+          setTimeout(() => {
+            window.location.href = '/login.html';
+          }, 1500);
         } else {
-          alert("Registration failed: " + data.message);
+          showAuthMessage(form, "Registration failed: " + data.message, false);
         }
       }
     } catch (err) {
