@@ -1,1 +1,55 @@
-[]
+[
+  {
+    "id": "usr_1",
+    "name": "Arjun Kumar",
+    "email": "arjun@roadguard.ai",
+    "password": "pbkdf2:sha256:260000$defaultpbkdf2hashvaluecitizen1",
+    "role": "citizen",
+    "points": 185,
+    "trust_score": 100,
+    "trust_level": "Trusted Citizen",
+    "badges": [
+      "Road Protector",
+      "Community Guardian"
+    ],
+    "created_at": "2026-06-15T09:00:00Z"
+  },
+  {
+    "id": "usr_2",
+    "name": "Priya Sharma",
+    "email": "priya@roadguard.ai",
+    "password": "pbkdf2:sha256:260000$defaultpbkdf2hashvaluecitizen2",
+    "role": "citizen",
+    "points": 75,
+    "trust_score": 92,
+    "trust_level": "Trusted Citizen",
+    "badges": [
+      "Road Protector"
+    ],
+    "created_at": "2026-06-18T14:30:00Z"
+  },
+  {
+    "id": "usr_3",
+    "name": "Officer Vikram Rathore",
+    "email": "vikram@roadguard.ai",
+    "password": "pbkdf2:sha256:260000$defaultpbkdf2hashvalueauthority",
+    "role": "authority",
+    "points": 0,
+    "trust_score": 100,
+    "trust_level": "Trusted Citizen",
+    "badges": [],
+    "created_at": "2026-06-10T08:00:00Z"
+  },
+  {
+    "id": "usr_4",
+    "name": "Suresh Iyer",
+    "email": "suresh@roadguard.ai",
+    "password": "pbkdf2:sha256:260000$defaultpbkdf2hashvalueadmin",
+    "role": "admin",
+    "points": 0,
+    "trust_score": 100,
+    "trust_level": "Trusted Citizen",
+    "badges": [],
+    "created_at": "2026-06-01T10:00:00Z"
+  }
+]

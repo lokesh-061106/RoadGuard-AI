@@ -1,1 +1,58 @@
-[]
+[
+  {
+    "id": "tx_2001",
+    "user_id": "usr_1",
+    "type": "earn",
+    "points": 50,
+    "reason": "Verified High Severity Pothole Report",
+    "timestamp": "2026-06-20T12:05:00Z"
+  },
+  {
+    "id": "tx_2002",
+    "user_id": "usr_2",
+    "type": "earn",
+    "points": 25,
+    "reason": "Verified Medium Severity Streetlight Failure Report",
+    "timestamp": "2026-06-22T10:00:00Z"
+  },
+  {
+    "id": "tx_2003",
+    "user_id": "usr_1",
+    "type": "earn",
+    "points": 100,
+    "reason": "Verified Critical Drainage Clog Report",
+    "timestamp": "2026-06-23T08:00:00Z"
+  },
+  {
+    "id": "tx_2004",
+    "user_id": "usr_2",
+    "type": "earn",
+    "points": 10,
+    "reason": "Verified Low Severity Damaged Signboard Report",
+    "timestamp": "2026-06-24T10:05:00Z"
+  },
+  {
+    "id": "tx_2005",
+    "user_id": "usr_1",
+    "type": "redeem",
+    "points": 40,
+    "reward_name": "Public Transport Credit ($5 Value) - SIMULATION",
+    "timestamp": "2026-06-24T12:00:00Z"
+  },
+  {
+    "id": "tx_2006",
+    "user_id": "usr_2",
+    "type": "earn",
+    "points": 40,
+    "reason": "Initial Registration Reward",
+    "timestamp": "2026-06-18T14:30:00Z"
+  },
+  {
+    "id": "tx_2007",
+    "user_id": "usr_1",
+    "type": "earn",
+    "points": 75,
+    "reason": "Consistent Weekly Patrol Bonus",
+    "timestamp": "2026-06-23T18:00:00Z"
+  }
+]

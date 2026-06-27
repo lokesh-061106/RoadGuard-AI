@@ -1,1 +1,75 @@
-{}
+{
+  "summary": {
+    "total_incidents": 4,
+    "resolved": 1,
+    "in_progress": 2,
+    "reported": 1,
+    "average_risk_score": 68.0,
+    "total_budget_spent": "$280",
+    "estimated_outstanding_budget": "$1170"
+  },
+  "severity_distribution": {
+    "Critical": 1,
+    "High": 1,
+    "Medium": 1,
+    "Low": 1
+  },
+  "category_distribution": {
+    "Road Damage": 1,
+    "Electrical / Lighting": 1,
+    "Sanitation & Drainage": 1,
+    "Traffic Signage": 1
+  },
+  "hotspots": [
+    {
+      "latitude": 13.0358,
+      "longitude": 77.5978,
+      "weight": 0.85,
+      "description": "Pothole (NH-44)"
+    },
+    {
+      "latitude": 12.9842,
+      "longitude": 77.7289,
+      "weight": 0.6,
+      "description": "Streetlight Failure (Whitefield)"
+    },
+    {
+      "latitude": 12.9344,
+      "longitude": 77.6206,
+      "weight": 0.92,
+      "description": "Drainage Clog (Koramangala)"
+    },
+    {
+      "latitude": 12.9279,
+      "longitude": 77.6811,
+      "weight": 0.35,
+      "description": "Signboard Damaged (ORR)"
+    }
+  ],
+  "monthly_risk_trend": [
+    {
+      "month": "January",
+      "risk_index": 45
+    },
+    {
+      "month": "February",
+      "risk_index": 50
+    },
+    {
+      "month": "March",
+      "risk_index": 42
+    },
+    {
+      "month": "April",
+      "risk_index": 55
+    },
+    {
+      "month": "May",
+      "risk_index": 60
+    },
+    {
+      "month": "June",
+      "risk_index": 68
+    }
+  ]
+}

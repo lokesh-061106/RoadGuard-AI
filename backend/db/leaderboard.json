@@ -1,1 +1,21 @@
-[]
+[
+  {
+    "user_id": "usr_1",
+    "name": "Arjun Kumar",
+    "points": 185,
+    "badges": [
+      "Road Protector",
+      "Community Guardian"
+    ],
+    "rank": 1
+  },
+  {
+    "user_id": "usr_2",
+    "name": "Priya Sharma",
+    "points": 75,
+    "badges": [
+      "Road Protector"
+    ],
+    "rank": 2
+  }
+]

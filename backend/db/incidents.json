@@ -1,1 +1,205 @@
-[]
+[
+  {
+    "id": "inc_1001",
+    "reporter_id": "usr_1",
+    "reporter_name": "Arjun Kumar",
+    "image_name": "pothole_nh44.jpg",
+    "image_url": "/static/images/pothole_nh44.jpg",
+    "description": "Large pothole in the middle lane of NH-44 near Hebbal, causing vehicles to swerve suddenly.",
+    "latitude": 13.0358,
+    "longitude": 77.5978,
+    "status": "in-progress",
+    "location_context": {
+      "road_category": "National Highway",
+      "traffic_density": "High",
+      "school_zone": false,
+      "accident_history_count": 8,
+      "population_density": "High"
+    },
+    "detection": {
+      "damage_type": "Pothole",
+      "severity": "High",
+      "confidence": "94%",
+      "category": "Road Damage"
+    },
+    "risk": {
+      "risk_score": 85,
+      "priority": "Critical",
+      "explanation": "Pothole is located on a High Traffic National Highway with a history of recurrent accidents."
+    },
+    "repair": {
+      "repair_method": "Hot-mix asphalt filling with mechanical compaction",
+      "materials": [
+        "Asphalt concrete",
+        "Tack coat",
+        "Bituminous sealant"
+      ],
+      "estimated_cost": "$450",
+      "estimated_duration": "4 hours"
+    },
+    "dispatch": {
+      "incident_id": "inc_1001",
+      "status": "Dispatched",
+      "department": "National Highways Authority",
+      "work_order_id": "wo_99201"
+    },
+    "reward": {
+      "reward_points": 50,
+      "badge_awarded": null
+    },
+    "created_at": "2026-06-20T12:00:00Z",
+    "updated_at": "2026-06-20T12:05:00Z"
+  },
+  {
+    "id": "inc_1002",
+    "reporter_id": "usr_2",
+    "reporter_name": "Priya Sharma",
+    "image_name": "streetlight_whitefield.jpg",
+    "image_url": "/static/images/streetlight_whitefield.jpg",
+    "description": "Broken streetlight pole at ITPL main road junction. Dangerous at night.",
+    "latitude": 12.9842,
+    "longitude": 77.7289,
+    "status": "resolved",
+    "location_context": {
+      "road_category": "Arterial Road",
+      "traffic_density": "Medium",
+      "school_zone": true,
+      "accident_history_count": 2,
+      "population_density": "High"
+    },
+    "detection": {
+      "damage_type": "Streetlight Failure",
+      "severity": "Medium",
+      "confidence": "89%",
+      "category": "Electrical / Lighting"
+    },
+    "risk": {
+      "risk_score": 60,
+      "priority": "High",
+      "explanation": "Streetlight failure located in a school zone with medium traffic, increasing pedestrian hazards at night."
+    },
+    "repair": {
+      "repair_method": "Replacement of LED luminaire and pole rewiring",
+      "materials": [
+        "120W LED streetlight fixture",
+        "Anchor bolts",
+        "Electrical cable"
+      ],
+      "estimated_cost": "$280",
+      "estimated_duration": "2 hours"
+    },
+    "dispatch": {
+      "incident_id": "inc_1002",
+      "status": "Completed",
+      "department": "Municipal Electricity Department",
+      "work_order_id": "wo_99202"
+    },
+    "reward": {
+      "reward_points": 25,
+      "badge_awarded": "Road Protector"
+    },
+    "created_at": "2026-06-21T18:30:00Z",
+    "updated_at": "2026-06-22T10:00:00Z"
+  },
+  {
+    "id": "inc_1003",
+    "reporter_id": "usr_1",
+    "reporter_name": "Arjun Kumar",
+    "image_name": "drainage_koramangala.jpg",
+    "image_url": "/static/images/drainage_koramangala.jpg",
+    "description": "Clogged drainage inlet causing severe waterlogging across two lanes near St. John's hospital.",
+    "latitude": 12.9344,
+    "longitude": 77.6206,
+    "status": "dispatched",
+    "location_context": {
+      "road_category": "Arterial Road",
+      "traffic_density": "High",
+      "school_zone": false,
+      "accident_history_count": 4,
+      "population_density": "Very High"
+    },
+    "detection": {
+      "damage_type": "Drainage Clog",
+      "severity": "Critical",
+      "confidence": "96%",
+      "category": "Sanitation & Drainage"
+    },
+    "risk": {
+      "risk_score": 92,
+      "priority": "Critical",
+      "explanation": "Critical drainage failure causing road inundation adjacent to a major hospital zone with very high population density."
+    },
+    "repair": {
+      "repair_method": "High-pressure hydro-jetting and silt extraction",
+      "materials": [
+        "De-silting equipment",
+        "Gully grate replacement"
+      ],
+      "estimated_cost": "$600",
+      "estimated_duration": "6 hours"
+    },
+    "dispatch": {
+      "incident_id": "inc_1003",
+      "status": "Dispatched",
+      "department": "Stormwater Drainage Dept",
+      "work_order_id": "wo_99203"
+    },
+    "reward": {
+      "reward_points": 100,
+      "badge_awarded": "Community Guardian"
+    },
+    "created_at": "2026-06-23T07:15:00Z",
+    "updated_at": "2026-06-23T08:00:00Z"
+  },
+  {
+    "id": "inc_1004",
+    "reporter_id": "usr_2",
+    "reporter_name": "Priya Sharma",
+    "image_name": "signboard_orr.jpg",
+    "image_url": "/static/images/signboard_orr.jpg",
+    "description": "Speed limit signboard is bent and lying on the sidewalk near Bellandur pedestrian bridge.",
+    "latitude": 12.9279,
+    "longitude": 77.6811,
+    "status": "reported",
+    "location_context": {
+      "road_category": "State Highway",
+      "traffic_density": "High",
+      "school_zone": false,
+      "accident_history_count": 1,
+      "population_density": "High"
+    },
+    "detection": {
+      "damage_type": "Damaged Signboard",
+      "severity": "Low",
+      "confidence": "91%",
+      "category": "Traffic Signage"
+    },
+    "risk": {
+      "risk_score": 35,
+      "priority": "Low",
+      "explanation": "Damaged speed limit sign is lying safely on the sidewalk, representing low immediate safety hazard."
+    },
+    "repair": {
+      "repair_method": "Post re-installation and concrete reinforcement",
+      "materials": [
+        "Steel mounting brackets",
+        "Concrete mix",
+        "Fasteners"
+      ],
+      "estimated_cost": "$120",
+      "estimated_duration": "1.5 hours"
+    },
+    "dispatch": {
+      "incident_id": "inc_1004",
+      "status": "Pending Review",
+      "department": "Traffic Management Agency",
+      "work_order_id": null
+    },
+    "reward": {
+      "reward_points": 10,
+      "badge_awarded": null
+    },
+    "created_at": "2026-06-24T10:00:00Z",
+    "updated_at": "2026-06-24T10:05:00Z"
+  }
+]
