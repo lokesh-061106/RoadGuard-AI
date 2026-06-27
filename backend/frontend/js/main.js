@@ -53,14 +53,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Instantly bind forms and page logic
   routePageLogic();
 
-  // Perform background server auth and user sync
-  syncLocalUsersWithServer().then(() => {
-    checkAuthStatus().then(() => {
-      if (State.user) {
-        syncLocalIncidentsWithServer();
-      }
-    });
-  });
+  // Perform background server auth and user sync independently
+  checkAuthStatus().then(() => {
+    if (State.user) {
+      syncLocalIncidentsWithServer();
+    }
+  }).catch(err => console.error("Auth check failed:", err));
+
+  syncLocalUsersWithServer().catch(err => console.error("User sync failed:", err));
 });
 
 // =====================================================================
