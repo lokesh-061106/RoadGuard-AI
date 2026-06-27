@@ -352,7 +352,12 @@ function initRegisterPage() {
         alert("Account created successfully! Please log in.");
         window.location.href = '/login.html';
       } else {
-        alert("Registration failed: " + data.message);
+        if (data.message && data.message.toLowerCase().includes("already registered")) {
+          alert("This email is already registered! Redirecting to login...");
+          window.location.href = '/login.html';
+        } else {
+          alert("Registration failed: " + data.message);
+        }
       }
     } catch (err) {
       alert("Error: " + err);
